@@ -323,24 +323,46 @@ function mergePatch<T>(target: T, patch: unknown): T {
   return result as T;
 }
 
+/** patch 选项：`replace` 里的段按整段替换落盘 */
+export interface PatchOptions {
+  /**
+   * 需要「删键」语义的段。默认 patch 是递归合并（只增不删），
+   * 清空 meta、删标签、删回收站条目等场景必须显式声明为整段替换，
+   * 否则旧键会被合并保留（I1/I2/I4/D2/D4 都依赖这个语义）。
+   */
+  replace?: Array<keyof LocalDB>;
+}
+
 /**
  * 合并写入 LocalDB（只落盘被 patch 命中的段）。
  * 整段替换的段（如 linkStatus 全量）也走这里，调用方注意不要整体覆盖 status。
  */
-export async function patchDb(patch: DeepPartial<LocalDB>): Promise<LocalDB> {
-  return withWriteLock(() => applyPatch(patch));
+export async function patchDb(
+  patch: DeepPartial<LocalDB>,
+  options?: PatchOptions,
+): Promise<LocalDB> {
+  return withWriteLock(() => applyPatch(patch, options));
 }
 
 /**
  * 同 `patchDb`，但**不自带锁**。
  * 只允许在已经持有 `withWriteLock` 的调用链里使用（锁不可重入，嵌套会死锁）。
  */
-export async function applyPatch(patch: DeepPartial<LocalDB>): Promise<LocalDB> {
+export async function applyPatch(
+  patch: DeepPartial<LocalDB>,
+  options?: PatchOptions,
+): Promise<LocalDB> {
   assertWritable();
   const db = await readDb();
+  const replaceKeys = new Set<keyof LocalDB>(options?.replace ?? []);
   const changed: Array<keyof LocalDB> = [];
   for (const key of Object.keys(patch) as Array<keyof LocalDB>) {
-    const next = mergePatch(db[key], (patch as Record<string, unknown>)[key]);
+    const value = (patch as Record<string, unknown>)[key];
+    // 值为 undefined 时视为「本段不变」；否则 replace 会把整段置成 undefined
+    if (value === undefined) continue;
+    const next = replaceKeys.has(key)
+      ? (structuredClone(value) as LocalDB[typeof key])
+      : mergePatch(db[key], value);
     if (next !== db[key]) {
       (db as unknown as Record<string, unknown>)[key] = next;
       changed.push(key);
@@ -428,7 +450,11 @@ export async function runMigrations(): Promise<LocalDB> {
 
   for (let version = from + 1; version <= SCHEMA_VERSION; version += 1) {
     const migrate = MIGRATIONS[version];
-    if (!migrate) continue;
+    // 缺迁移函数说明 SCHEMA_VERSION 提了但没写迁移：明确告警，避免「静默跳级」
+    if (!migrate) {
+      console.warn(`[storage] 缺少 v${version} 的迁移函数，按无变更处理（检查 SCHEMA_VERSION）`);
+      continue;
+    }
     db = await migrate(db);
     db.schemaVersion = version;
   }

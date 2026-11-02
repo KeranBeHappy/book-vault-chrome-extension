@@ -56,7 +56,8 @@ export function hasMessage(key: string): boolean {
 }
 
 /**
- * 取文案。支持 chrome.i18n 风格的 `$1`/`$2` 占位符。
+ * 取文案。占位符用**具名**写法 `$count` / `$name`，与调用点传入的
+ * `Record<string, ...>` 键名一一对应（不用 `$1`/`$2`，避免与参数顺序耦合）。
  * 读取 `locale.value` 以建立响应式依赖，因此切换语言会触发重渲染。
  */
 export function t(key: string, params?: Record<string, string | number>): string {
@@ -69,7 +70,15 @@ export function t(key: string, params?: Record<string, string | number>): string
   }
 
   if (!params) return entry.message;
-  return entry.message.replace(/\$(\d+)/g, (_match, index: string) => String(params[index] ?? ''));
+  return entry.message.replace(/\$([A-Za-z0-9_]+)/g, (match, name: string) => {
+    const value = params[name];
+    if (value === undefined) {
+      // 漏传参数时保留占位符原文，方便在界面上直接发现而不是静默变空串
+      if (import.meta.env.DEV) console.error(`[i18n] ${key} 缺少参数: ${name}`);
+      return match;
+    }
+    return String(value);
+  });
 }
 
 /**

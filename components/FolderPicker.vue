@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import type { ManagedRoot } from '@/modules/bookmarks';
+import type { FolderRow, ManagedRoot } from '@/modules/bookmarks';
 import { t } from '@/modules/i18n';
-import type { BookmarkNode } from '@/shared/types';
-
-interface FolderRow {
-  node: BookmarkNode;
-  path: string[];
-  rootId: string;
-  depth: number;
-}
 
 const props = defineProps<{
   roots: ManagedRoot[];

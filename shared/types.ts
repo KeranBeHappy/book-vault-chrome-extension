@@ -394,6 +394,8 @@ export interface BackupFile {
   rules?: CategoryRule[];
   proxyBlocklist?: string[];
   bookmarkMeta?: Record<string, BookmarkMeta>;
+  /** 挂起的标签备注（I1 / D-5）；旧备份没有该字段时按空处理 */
+  orphanMeta?: Record<string, BookmarkMeta>;
 }
 
 /* ------------------------------------------------------------------ */

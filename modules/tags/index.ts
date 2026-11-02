@@ -93,7 +93,8 @@ export async function setMeta(
     const bookmarkMeta = { ...db.bookmarkMeta };
     if (isEmptyMeta(next)) delete bookmarkMeta[bookmarkId];
     else bookmarkMeta[bookmarkId] = next;
-    await applyPatch({ bookmarkMeta });
+    // 清空最后一条标签/备注时要真的删键，故整段替换
+    await applyPatch({ bookmarkMeta }, { replace: ['bookmarkMeta'] });
   });
 }
 
@@ -168,7 +169,10 @@ export async function renameTag(from: string, to: string): Promise<{ updated: nu
   return withWriteLock(async () => {
     const db = await readDb();
     const result = renameTagIn(db.bookmarkMeta, db.orphanMeta, from, to);
-    await applyPatch({ bookmarkMeta: result.bookmarkMeta, orphanMeta: result.orphanMeta });
+    await applyPatch(
+      { bookmarkMeta: result.bookmarkMeta, orphanMeta: result.orphanMeta },
+      { replace: ['bookmarkMeta', 'orphanMeta'] },
+    );
     return { updated: result.updated };
   });
 }
@@ -178,7 +182,11 @@ export async function deleteTag(tag: string): Promise<{ updated: number }> {
   return withWriteLock(async () => {
     const db = await readDb();
     const result = deleteTagIn(db.bookmarkMeta, db.orphanMeta, tag);
-    await applyPatch({ bookmarkMeta: result.bookmarkMeta, orphanMeta: result.orphanMeta });
+    // 删除标签会把「只剩该标签」的条目移除，必须整段替换才真的删得掉
+    await applyPatch(
+      { bookmarkMeta: result.bookmarkMeta, orphanMeta: result.orphanMeta },
+      { replace: ['bookmarkMeta', 'orphanMeta'] },
+    );
     return { updated: result.updated };
   });
 }
@@ -188,7 +196,8 @@ export async function clearOrphanMeta(): Promise<{ cleared: number }> {
   return withWriteLock(async () => {
     const db = await readDb();
     const cleared = Object.keys(db.orphanMeta).length;
-    await applyPatch({ orphanMeta: {} });
+    // 清空必须是整段替换：合并语义下 `{}` 等于「什么都不做」
+    await applyPatch({ orphanMeta: {} }, { replace: ['orphanMeta'] });
     return { cleared };
   });
 }

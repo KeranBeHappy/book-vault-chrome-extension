@@ -332,7 +332,11 @@ export async function restoreFromContent(
         targetTree: await getTree(),
         orphanSeed: content.orphanMeta,
       });
-      await applyPatch({ bookmarkMeta: rebind.bookmarkMeta, orphanMeta: rebind.orphanMeta });
+      // 重绑是全量新映射，必须整段替换，否则旧 id 的键会残留
+      await applyPatch(
+        { bookmarkMeta: rebind.bookmarkMeta, orphanMeta: rebind.orphanMeta },
+        { replace: ['bookmarkMeta', 'orphanMeta'] },
+      );
 
       // 恢复后清理空文件夹
       const empties = await findEmptyFolders(await getTree());
@@ -375,13 +379,16 @@ async function rollback(preId: string): Promise<boolean> {
       targetTree: await getTree(),
       orphanSeed: content.orphanMeta,
     });
-    await applyPatch({
-      bookmarkMeta: rebind.bookmarkMeta,
-      orphanMeta: rebind.orphanMeta,
-      rules: content.rules,
-      proxyBlocklist: content.proxyBlocklist,
-      flags: { statsDirty: true },
-    });
+    await applyPatch(
+      {
+        bookmarkMeta: rebind.bookmarkMeta,
+        orphanMeta: rebind.orphanMeta,
+        rules: content.rules,
+        proxyBlocklist: content.proxyBlocklist,
+        flags: { statsDirty: true },
+      },
+      { replace: ['bookmarkMeta', 'orphanMeta'] },
+    );
     return true;
   } catch (err) {
     console.error('[backup] 回滚失败', err);
@@ -525,12 +532,15 @@ export async function deleteToRecycle(ids: string[]): Promise<{ deleted: number 
       for (const oldId of Object.keys(item.meta ?? {})) delete bookmarkMeta[oldId];
     }
 
-    await applyPatch({
-      recycleBin,
-      linkStatus,
-      bookmarkMeta,
-      flags: { statsDirty: true },
-    });
+    await applyPatch(
+      {
+        recycleBin,
+        linkStatus,
+        bookmarkMeta,
+        flags: { statsDirty: true },
+      },
+      { replace: ['bookmarkMeta', 'linkStatus'] },
+    );
     return { deleted: newItems.length };
   });
 }
@@ -560,11 +570,14 @@ export async function restoreRecycleItem(itemId: string): Promise<{ restored: nu
       delete bookmarkMeta[oldId];
     }
 
-    await applyPatch({
-      recycleBin: db.recycleBin.filter((entry) => entry.id !== itemId),
-      bookmarkMeta,
-      flags: { statsDirty: true },
-    });
+    await applyPatch(
+      {
+        recycleBin: db.recycleBin.filter((entry) => entry.id !== itemId),
+        bookmarkMeta,
+        flags: { statsDirty: true },
+      },
+      { replace: ['bookmarkMeta'] },
+    );
     return { restored: idMap.size, parentId: targetParent };
   });
 }
@@ -586,7 +599,7 @@ export async function clearRecycleBin(): Promise<{ cleared: number }> {
     for (const item of db.recycleBin) {
       for (const oldId of Object.keys(item.meta ?? {})) delete bookmarkMeta[oldId];
     }
-    await applyPatch({ recycleBin: [], bookmarkMeta });
+    await applyPatch({ recycleBin: [], bookmarkMeta }, { replace: ['bookmarkMeta'] });
     return { cleared: db.recycleBin.length };
   });
 }

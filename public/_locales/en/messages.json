@@ -1,15 +1,19 @@
 {
   "extName": {
     "message": "BookVault",
-    "description": "Extension name (shown on the extensions page and store)"
+    "description": "Extension name shown on the management page and store"
   },
   "extDesc": {
-    "message": "Local bookmark management: bulk rewrite, dead-link scan, rule based classification, duplicate merge, tags and notes, snapshots and encrypted WebDAV backups.",
+    "message": "Local-first bookmark manager: batch edits, dead link checks, rule-based sorting, duplicate merging, tags and notes, snapshot rollback and encrypted Nutstore backups.",
     "description": "Extension description"
   },
   "cmdOpenManager": {
     "message": "Open BookVault manager",
     "description": "Keyboard shortcut description"
+  },
+  "menuAddBookmark": {
+    "message": "Save to BookVault",
+    "description": "Browser context menu item"
   },
   "popupTitle": {
     "message": "BookVault",
@@ -20,11 +24,1355 @@
     "description": "Manager page title"
   },
   "captureTitle": {
-    "message": "Save window tabs",
+    "message": "Save current window tabs",
     "description": "Capture window title"
   },
+  "captureModeWindow": {
+    "message": "Save tabs in the current window"
+  },
+  "captureModePage": {
+    "message": "Save the current page"
+  },
+  "captureSelected": {
+    "message": "$count selected"
+  },
+  "captureExcludedHint": {
+    "message": "$count page(s) cannot be saved and are excluded"
+  },
+  "captureDuplicateTag": {
+    "message": "Already saved"
+  },
+  "captureNoteLabel": {
+    "message": "Note for all (optional)"
+  },
+  "captureNotePlaceholder": {
+    "message": "Added to the bookmarks created this time"
+  },
+  "captureTargetLabel": {
+    "message": "Target folder"
+  },
+  "captureConfirmTitle": {
+    "message": "Save tabs"
+  },
+  "captureConfirmMessage": {
+    "message": "Save $count bookmark(s) to \"$folder\""
+  },
+  "captureResultTitle": {
+    "message": "Save result"
+  },
+  "captureResultCreated": {
+    "message": "$count created"
+  },
+  "captureResultDuplicates": {
+    "message": "$count duplicate(s) skipped"
+  },
+  "captureResultExcluded": {
+    "message": "$count page(s) excluded"
+  },
+  "captureResultFailed": {
+    "message": "$count failed"
+  },
+  "captureEmpty": {
+    "message": "No page in the current window can be saved"
+  },
+  "captureCloseWindow": {
+    "message": "Close window"
+  },
+  "captureLoading": {
+    "message": "Reading tabs…"
+  },
   "placeholder": {
-    "message": "Skeleton page: features not implemented yet",
+    "message": "Skeleton page: coming soon",
     "description": "Placeholder hint, remove after implementation"
+  },
+  "loading": {
+    "message": "Loading…"
+  },
+  "none": {
+    "message": "None"
+  },
+  "yes": {
+    "message": "Yes"
+  },
+  "no": {
+    "message": "No"
+  },
+  "unnamedFolder": {
+    "message": "Untitled folder"
+  },
+  "allBookmarks": {
+    "message": "All bookmarks"
+  },
+  "view_manager": {
+    "message": "Bookmarks"
+  },
+  "view_stats": {
+    "message": "Stats"
+  },
+  "view_rules": {
+    "message": "Rules"
+  },
+  "view_tags": {
+    "message": "Tags"
+  },
+  "view_backup": {
+    "message": "Backup"
+  },
+  "view_settings": {
+    "message": "Settings"
+  },
+  "opAction_move": {
+    "message": "Move"
+  },
+  "opAction_delete": {
+    "message": "Delete"
+  },
+  "opAction_rename": {
+    "message": "Rename"
+  },
+  "opAction_classify": {
+    "message": "Classify"
+  },
+  "opAction_rewrite": {
+    "message": "Rewrite links"
+  },
+  "opAction_refreshTitle": {
+    "message": "Refresh titles"
+  },
+  "opAction_import": {
+    "message": "Import"
+  },
+  "opAction_capture": {
+    "message": "Capture"
+  },
+  "opAction_restore": {
+    "message": "Restore"
+  },
+  "snapshotSource_manual": {
+    "message": "Manual"
+  },
+  "snapshotSource_preOperation": {
+    "message": "Auto before change"
+  },
+  "snapshotSource_autoDaily": {
+    "message": "Daily auto"
+  },
+  "snapshotSource_import": {
+    "message": "Before import"
+  },
+  "snapshotSource_restorePre": {
+    "message": "Before restore"
+  },
+  "actionApply": {
+    "message": "Apply"
+  },
+  "actionApplyClassify": {
+    "message": "Apply categories"
+  },
+  "actionBackupCloud": {
+    "message": "Back up to cloud"
+  },
+  "actionBackupLocal": {
+    "message": "Local backup only"
+  },
+  "actionCancel": {
+    "message": "Cancel"
+  },
+  "actionCaptureWindow": {
+    "message": "Save window tabs"
+  },
+  "actionChangePassword": {
+    "message": "Change password"
+  },
+  "actionCheckLinks": {
+    "message": "Check dead links"
+  },
+  "actionClassify": {
+    "message": "Sort by rules"
+  },
+  "actionClearFilter": {
+    "message": "Clear filter"
+  },
+  "actionClearOrphans": {
+    "message": "Clear orphan notes"
+  },
+  "actionClearRecycle": {
+    "message": "Empty recycle bin"
+  },
+  "actionClearSelection": {
+    "message": "Clear selection"
+  },
+  "actionClearVault": {
+    "message": "Clear local key"
+  },
+  "actionClose": {
+    "message": "Close"
+  },
+  "actionConfirm": {
+    "message": "OK"
+  },
+  "actionCopyLink": {
+    "message": "Copy link"
+  },
+  "actionCopyUrl": {
+    "message": "Copy URL"
+  },
+  "actionDedupe": {
+    "message": "Find duplicates"
+  },
+  "actionDelete": {
+    "message": "Delete"
+  },
+  "actionDisable": {
+    "message": "Disable"
+  },
+  "actionEdit": {
+    "message": "Edit"
+  },
+  "actionEnable": {
+    "message": "Enable"
+  },
+  "actionExpand": {
+    "message": "Expand or collapse"
+  },
+  "actionExportCsv": {
+    "message": "Export CSV"
+  },
+  "actionExportHtml": {
+    "message": "Export HTML"
+  },
+  "actionExportJson": {
+    "message": "Export JSON"
+  },
+  "actionExportRules": {
+    "message": "Export rules"
+  },
+  "actionGeneratePreview": {
+    "message": "Generate preview"
+  },
+  "actionGotoSettings": {
+    "message": "Go to settings"
+  },
+  "actionImport": {
+    "message": "Import"
+  },
+  "actionImportHtml": {
+    "message": "Import HTML"
+  },
+  "actionImportJson": {
+    "message": "Import JSON"
+  },
+  "actionImportRules": {
+    "message": "Import rules"
+  },
+  "actionMerge": {
+    "message": "Merge"
+  },
+  "actionMoveTo": {
+    "message": "Move to"
+  },
+  "actionNewBookmark": {
+    "message": "New bookmark"
+  },
+  "actionNewFolder": {
+    "message": "New folder"
+  },
+  "actionNewRule": {
+    "message": "New rule"
+  },
+  "actionOpen": {
+    "message": "Open"
+  },
+  "actionOpenSelected": {
+    "message": "Open selected"
+  },
+  "actionPreview": {
+    "message": "Preview"
+  },
+  "actionRecompute": {
+    "message": "Recompute"
+  },
+  "actionRefresh": {
+    "message": "Refresh"
+  },
+  "actionRefreshTitles": {
+    "message": "Refresh titles"
+  },
+  "actionRename": {
+    "message": "Rename"
+  },
+  "actionRestore": {
+    "message": "Restore"
+  },
+  "actionSave": {
+    "message": "Save"
+  },
+  "actionScanEmpty": {
+    "message": "Clean empty folders"
+  },
+  "actionSelectAll": {
+    "message": "Select all"
+  },
+  "actionStop": {
+    "message": "Stop"
+  },
+  "actionTagsNote": {
+    "message": "Tags and notes"
+  },
+  "actionTestConnection": {
+    "message": "Test connection"
+  },
+  "actionUndo": {
+    "message": "Undo"
+  },
+  "backupTitle": {
+    "message": "Backup and restore"
+  },
+  "backupLocalDone": {
+    "message": "Backed up locally"
+  },
+  "backupUploaded": {
+    "message": "Uploaded to cloud: $name"
+  },
+  "bookmarkCreateTitle": {
+    "message": "New bookmark"
+  },
+  "bookmarkEditTitle": {
+    "message": "Edit bookmark"
+  },
+  "bookmarkCreated": {
+    "message": "Bookmark created"
+  },
+  "bookmarkSaved": {
+    "message": "Bookmark saved"
+  },
+  "bookmarkDeleteTitle": {
+    "message": "Delete bookmarks"
+  },
+  "bookmarkDeleteMessage": {
+    "message": "Delete the $count selected bookmark(s)?"
+  },
+  "bookmarkDeleted": {
+    "message": "Deleted $count bookmark(s)"
+  },
+  "classifyApplyTitle": {
+    "message": "Apply classification"
+  },
+  "classifyApplyMessage": {
+    "message": "$count bookmark(s) will be moved by the rules"
+  },
+  "classifyApplied": {
+    "message": "Moved $moved, failed $invalid"
+  },
+  "classifyDiscardHint": {
+    "message": "Original folders that become empty will be deleted"
+  },
+  "classifyImpact": {
+    "message": "Preview: $total bookmark(s), $folders empty folder(s) will be removed"
+  },
+  "classifyManual": {
+    "message": "Adjust manually"
+  },
+  "classifyPreviewHint": {
+    "message": "You can adjust the preview below; changes apply to this run only"
+  },
+  "classifyPreviewTitle": {
+    "message": "Classification preview"
+  },
+  "classifyRemovedFolders": {
+    "message": "$count empty folder(s) will be removed"
+  },
+  "clearVaultTitle": {
+    "message": "Clear local key"
+  },
+  "clearVaultMessage": {
+    "message": "Clear the key cached on this device? You will need to enter the password again to decrypt backups."
+  },
+  "clearVaultDetail": {
+    "message": "Cloud backup files are untouched; only the local copy of the key is removed."
+  },
+  "cloudTitle": {
+    "message": "Cloud backups"
+  },
+  "cloudDeleted": {
+    "message": "Cloud backup deleted"
+  },
+  "cloudDeleteTitle": {
+    "message": "Delete cloud backup"
+  },
+  "cloudDeleteMessage": {
+    "message": "Delete cloud backup $name?"
+  },
+  "cloudEmpty": {
+    "message": "No cloud backups yet"
+  },
+  "cloudEncryptedOn": {
+    "message": "Encrypted"
+  },
+  "cloudEncryptedOff": {
+    "message": "Not encrypted"
+  },
+  "cloudNotConfigured": {
+    "message": "WebDAV is not configured"
+  },
+  "cloudPasswordTitle": {
+    "message": "Enter backup password"
+  },
+  "cloudPasswordHint": {
+    "message": "The password is used for this operation only and is never written to disk"
+  },
+  "cloudRestoreTitle": {
+    "message": "Restore from cloud"
+  },
+  "cloudRestoreMessage": {
+    "message": "Restore $count bookmark(s) from $name ($type)"
+  },
+  "colTitle": {
+    "message": "Title"
+  },
+  "colFolder": {
+    "message": "Folder"
+  },
+  "colStatus": {
+    "message": "Status"
+  },
+  "colActions": {
+    "message": "Actions"
+  },
+  "colCount": {
+    "message": "Count"
+  },
+  "colSource": {
+    "message": "Source"
+  },
+  "colTime": {
+    "message": "Time"
+  },
+  "colSize": {
+    "message": "Size"
+  },
+  "colFileName": {
+    "message": "File name"
+  },
+  "copiedCount": {
+    "message": "Copied $count link(s)"
+  },
+  "csvUrl": {
+    "message": "URL"
+  },
+  "csvDomain": {
+    "message": "Domain"
+  },
+  "csvHttpStatus": {
+    "message": "HTTP status"
+  },
+  "csvCheckedAt": {
+    "message": "Checked at"
+  },
+  "csvError": {
+    "message": "Failure reason"
+  },
+  "csvProxySuspect": {
+    "message": "Proxy suspected"
+  },
+  "csvNoData": {
+    "message": "The current list is empty; nothing to export"
+  },
+  "davCode_ok": {
+    "message": "Connection OK"
+  },
+  "davCode_unauthorized": {
+    "message": "Authentication failed (401); check the account and app password"
+  },
+  "davCode_forbidden": {
+    "message": "Access denied (403)"
+  },
+  "davCode_notFound": {
+    "message": "Path not found (404); check the remote directory"
+  },
+  "davCode_rateLimited": {
+    "message": "Too many requests (429); try again later"
+  },
+  "davCode_serverError": {
+    "message": "Server error (5xx); try again later"
+  },
+  "davCode_network": {
+    "message": "Network unreachable; check your connection or proxy"
+  },
+  "davCode_unknown": {
+    "message": "Unknown error"
+  },
+  "davTestMethod": {
+    "message": "Method"
+  },
+  "davTestUrl": {
+    "message": "Final URL"
+  },
+  "davTestStatus": {
+    "message": "Status"
+  },
+  "davTestDuration": {
+    "message": "Duration"
+  },
+  "davTestOk": {
+    "message": "Connected; $count file(s) on the server"
+  },
+  "davTestDetail": {
+    "message": "Details"
+  },
+  "dedupeTitle": {
+    "message": "Duplicate bookmarks"
+  },
+  "dedupeTabUrl": {
+    "message": "Same URL ($count groups)"
+  },
+  "dedupeTabTitle": {
+    "message": "Similar titles ($count groups)"
+  },
+  "dedupeEmpty": {
+    "message": "No bookmarks share the same URL"
+  },
+  "dedupeTitleEmpty": {
+    "message": "No bookmarks have similar titles"
+  },
+  "dedupeTitleHint": {
+    "message": "Adjust the similarity threshold in settings"
+  },
+  "dedupeCount": {
+    "message": "$count item(s) in this group"
+  },
+  "dedupeSkipped": {
+    "message": "Skipped $count oversized group(s)"
+  },
+  "dedupeFooterHint": {
+    "message": "Checked items are kept, the rest are deleted and can be restored from a snapshot"
+  },
+  "dedupeMergeTitle": {
+    "message": "Merge duplicates"
+  },
+  "dedupeMergeMessage": {
+    "message": "Delete $count duplicate bookmark(s)?"
+  },
+  "dedupeMergeHint": {
+    "message": "Tags and notes of deleted bookmarks are not migrated to the kept one"
+  },
+  "dedupeMerged": {
+    "message": "Merged and deleted $count"
+  },
+  "detailTitle": {
+    "message": "Bookmark details"
+  },
+  "detailEmpty": {
+    "message": "Select a bookmark in the list to see its details"
+  },
+  "emptyFolderTitle": {
+    "message": "Clean empty folders"
+  },
+  "emptyFolderMessage": {
+    "message": "Delete $count empty folder(s)?"
+  },
+  "emptyFolderNone": {
+    "message": "No empty folders found"
+  },
+  "emptyFolderCleaned": {
+    "message": "Removed $count empty folder(s)"
+  },
+  "encryptSetupTitle": {
+    "message": "Set backup password"
+  },
+  "encryptChangeTitle": {
+    "message": "Change backup password"
+  },
+  "encryptAck": {
+    "message": "I understand the risks above"
+  },
+  "encryptNeedAck": {
+    "message": "Please confirm the risk notice first"
+  },
+  "encryptEnabledDone": {
+    "message": "Backup encryption enabled"
+  },
+  "encryptionScopeHint": {
+    "message": "Encryption applies to cloud backups and exported files only; local snapshots stay plain text."
+  },
+  "encryptionRiskHint": {
+    "message": "If the password is lost, encrypted cloud backups cannot be recovered. BookVault never stores your password."
+  },
+  "errUnknown": {
+    "message": "Something went wrong"
+  },
+  "errBackgroundUnavailable": {
+    "message": "The background service is not responding; retry or reload the extension"
+  },
+  "errStorageRead": {
+    "message": "Failed to read local data"
+  },
+  "errStorageWrite": {
+    "message": "Failed to write local data"
+  },
+  "errStorageTooLarge": {
+    "message": "Data exceeds the browser storage quota"
+  },
+  "errSchemaTooNew": {
+    "message": "Data was written by a newer version; running read-only. Please update the extension."
+  },
+  "errBookmarksRead": {
+    "message": "Failed to read browser bookmarks"
+  },
+  "errBookmarksWrite": {
+    "message": "Failed to write browser bookmarks"
+  },
+  "errUrlEmpty": {
+    "message": "URL cannot be empty"
+  },
+  "errUrlScheme": {
+    "message": "Only http and https links are supported"
+  },
+  "errUrlInvalid": {
+    "message": "Invalid URL format"
+  },
+  "errTitleEmpty": {
+    "message": "Title cannot be empty"
+  },
+  "errNodeMissing": {
+    "message": "The bookmark no longer exists"
+  },
+  "errFolderMissing": {
+    "message": "The target folder no longer exists"
+  },
+  "errFolderNoUrl": {
+    "message": "This node is not a bookmark, so its link cannot be rewritten"
+  },
+  "errNotFolder": {
+    "message": "This node is not a folder"
+  },
+  "errRootProtected": {
+    "message": "Built-in browser roots cannot be modified"
+  },
+  "errMobileRoot": {
+    "message": "The mobile bookmarks root cannot be modified"
+  },
+  "errNoManagedRoot": {
+    "message": "No managed root found; choose one in settings first"
+  },
+  "errSnapshotRequired": {
+    "message": "A snapshot is required before this operation"
+  },
+  "errSnapshotMissing": {
+    "message": "Snapshot not found or already deleted"
+  },
+  "errSnapshotWrite": {
+    "message": "Failed to write the snapshot; the operation was aborted"
+  },
+  "errSnapshotCorrupted": {
+    "message": "Snapshot checksum failed; the data may be corrupted"
+  },
+  "errRestoreFailed": {
+    "message": "An error occurred during restore"
+  },
+  "errUndoSnapshotMissing": {
+    "message": "The data needed to undo is missing"
+  },
+  "errNothingToUndo": {
+    "message": "Nothing to undo"
+  },
+  "errRecycleItemMissing": {
+    "message": "The recycle bin item no longer exists"
+  },
+  "errJobNotFound": {
+    "message": "Job not found or already finished"
+  },
+  "errTagEmpty": {
+    "message": "Tag name cannot be empty"
+  },
+  "errDavUnauthorized": {
+    "message": "WebDAV authentication failed (401); check the account and app password"
+  },
+  "errDavForbidden": {
+    "message": "WebDAV access denied (403); check the app password permissions"
+  },
+  "errDavNotFound": {
+    "message": "WebDAV path not found (404)"
+  },
+  "errDavRateLimited": {
+    "message": "WebDAV rate limited (429); try again later"
+  },
+  "errDavServer": {
+    "message": "WebDAV server error (5xx)"
+  },
+  "errDavNetwork": {
+    "message": "Cannot reach the WebDAV server; check your network"
+  },
+  "errDavUnknown": {
+    "message": "WebDAV operation failed (unknown error)"
+  },
+  "errDavNameConflict": {
+    "message": "A file with the same name already exists in the cloud"
+  },
+  "errWebdavDisabled": {
+    "message": "WebDAV is not enabled"
+  },
+  "errWebdavConfig": {
+    "message": "WebDAV settings are incomplete; fill in server, account and app password"
+  },
+  "errPasswordEmpty": {
+    "message": "Password cannot be empty"
+  },
+  "errPasswordRequired": {
+    "message": "This backup is encrypted; enter the password"
+  },
+  "errPasswordWrong": {
+    "message": "Wrong password, cannot decrypt"
+  },
+  "errVaultMissing": {
+    "message": "No key stored on this device; enter the password"
+  },
+  "errBackupStructure": {
+    "message": "The backup file format is invalid"
+  },
+  "errBackupCryptoMissing": {
+    "message": "The backup file is missing encryption parameters"
+  },
+  "errBackupCorrupted": {
+    "message": "The backup file is corrupted and cannot be parsed"
+  },
+  "errRulePatternEmpty": {
+    "message": "Pattern cannot be empty"
+  },
+  "errRuleCategoryEmpty": {
+    "message": "Category cannot be empty"
+  },
+  "errRuleImportInvalid": {
+    "message": "Invalid rules file format"
+  },
+  "errNoHttpBookmarks": {
+    "message": "No http(s) bookmarks to check in the current scope"
+  },
+  "fieldBookmarkTitle": {
+    "message": "Title"
+  },
+  "fieldBookmarkUrl": {
+    "message": "URL"
+  },
+  "fieldTargetFolder": {
+    "message": "Target folder"
+  },
+  "fieldTags": {
+    "message": "Tags"
+  },
+  "fieldNote": {
+    "message": "Note"
+  },
+  "fieldTheme": {
+    "message": "Theme"
+  },
+  "fieldLanguage": {
+    "message": "Language"
+  },
+  "fieldConcurrency": {
+    "message": "Check concurrency"
+  },
+  "fieldTimeout": {
+    "message": "Timeout per request (s)"
+  },
+  "fieldLocalKeep": {
+    "message": "Local snapshots to keep"
+  },
+  "fieldCloudKeep": {
+    "message": "Cloud backups to keep"
+  },
+  "fieldRecycleKeep": {
+    "message": "Recycle bin items to keep"
+  },
+  "fieldSimilarity": {
+    "message": "Title similarity threshold"
+  },
+  "fieldAutoBackupHour": {
+    "message": "Auto backup hour"
+  },
+  "fieldAutoBackupDaily": {
+    "message": "Daily auto backup"
+  },
+  "fieldWebdavEnabled": {
+    "message": "Enable WebDAV"
+  },
+  "fieldWebdavServer": {
+    "message": "Server URL"
+  },
+  "fieldWebdavUser": {
+    "message": "Account (email)"
+  },
+  "fieldWebdavPassword": {
+    "message": "App password"
+  },
+  "fieldWebdavDir": {
+    "message": "Remote directory"
+  },
+  "fieldEncryptEnabled": {
+    "message": "Encrypt backups"
+  },
+  "fieldRememberKey": {
+    "message": "Remember key on this device"
+  },
+  "fieldOldPassword": {
+    "message": "Current password"
+  },
+  "fieldNewPassword": {
+    "message": "New password"
+  },
+  "fieldRuleType": {
+    "message": "Rule type"
+  },
+  "fieldRulePattern": {
+    "message": "Pattern"
+  },
+  "fieldRuleCategory": {
+    "message": "Category"
+  },
+  "fieldEnabled": {
+    "message": "Enable this rule"
+  },
+  "filterAllStatus": {
+    "message": "All statuses"
+  },
+  "filterTags": {
+    "message": "Tag filter"
+  },
+  "folderCreateTitle": {
+    "message": "New folder"
+  },
+  "folderRenameTitle": {
+    "message": "Rename folder"
+  },
+  "folderCreated": {
+    "message": "Folder created"
+  },
+  "folderDeleteTitle": {
+    "message": "Delete folder"
+  },
+  "folderDeleteMessage": {
+    "message": "Delete folder \"$name\"?"
+  },
+  "folderDeleteCount": {
+    "message": "$count bookmark(s) inside will be deleted too"
+  },
+  "folderDeleted": {
+    "message": "Folder and its $count bookmark(s) deleted"
+  },
+  "foldersTitle": {
+    "message": "Folders"
+  },
+  "folderTreeLabel": {
+    "message": "Folder tree"
+  },
+  "importChooseTarget": {
+    "message": "Choose import location"
+  },
+  "importTarget": {
+    "message": "Import into \"$target\""
+  },
+  "importTitle": {
+    "message": "Confirm import"
+  },
+  "importMessage": {
+    "message": "$count bookmark(s) will be imported from \"$name\""
+  },
+  "importDuplicates": {
+    "message": "$count duplicate(s) will be skipped"
+  },
+  "importInvalid": {
+    "message": "$count invalid entr(ies) will be skipped"
+  },
+  "importRules": {
+    "message": "$count rule(s) will be imported"
+  },
+  "importMeta": {
+    "message": "$count tag/note record(s) will be restored"
+  },
+  "importTargetHint": {
+    "message": "Imported bookmarks are written into the managed root"
+  },
+  "importNothing": {
+    "message": "Nothing to import ($duplicates duplicate(s), $invalid invalid)"
+  },
+  "importDone": {
+    "message": "Import finished: $created created, $duplicates duplicates skipped, $invalid invalid"
+  },
+  "importPasswordTitle": {
+    "message": "Enter backup password"
+  },
+  "ioTitle": {
+    "message": "Import and export"
+  },
+  "ioHint": {
+    "message": "Supports BookVault JSON backups and HTML bookmark files exported by the browser"
+  },
+  "jobLinkCheck": {
+    "message": "Dead link check"
+  },
+  "jobTitleRefresh": {
+    "message": "Title refresh"
+  },
+  "jobStarted": {
+    "message": "Started on $count item(s)"
+  },
+  "jobCanceled": {
+    "message": "Job canceled"
+  },
+  "labelEncrypted": {
+    "message": "Encrypted"
+  },
+  "labelPlain": {
+    "message": "Not encrypted"
+  },
+  "labelUnknownFormat": {
+    "message": "Unknown format"
+  },
+  "languageSystem": {
+    "message": "Follow system"
+  },
+  "lastBackupError": {
+    "message": "Last backup failed"
+  },
+  "lastDailyBackup": {
+    "message": "Last auto backup: $date"
+  },
+  "pendingCloudBackup": {
+    "message": "A cloud backup was skipped and will be retried automatically"
+  },
+  "popupBackupDone": {
+    "message": "Backup finished"
+  },
+  "popupBackupFailed": {
+    "message": "Last backup failed: $reason"
+  },
+  "popupBackupLocalDone": {
+    "message": "Local snapshot created"
+  },
+  "popupBackupNow": {
+    "message": "Back up now"
+  },
+  "popupBackupNever": {
+    "message": "No cloud backup yet"
+  },
+  "popupLastBackup": {
+    "message": "Last cloud backup: $time"
+  },
+  "popupLinkCheckStarted": {
+    "message": "Started checking $count link(s)"
+  },
+  "popupOpenManager": {
+    "message": "Open manager"
+  },
+  "popupPendingCloud": {
+    "message": "A cloud backup is waiting to be retried"
+  },
+  "popupPendingVault": {
+    "message": "An encrypted backup is waiting for the password; handle it in the manager"
+  },
+  "localSnapshotsTitle": {
+    "message": "Local snapshots"
+  },
+  "metaSaved": {
+    "message": "Tags and notes saved"
+  },
+  "moveTitle": {
+    "message": "Move to folder"
+  },
+  "moveMessage": {
+    "message": "$count bookmark(s) will be moved to the selected folder"
+  },
+  "movedDone": {
+    "message": "Moved $moved, skipped $skipped"
+  },
+  "noBookmarks": {
+    "message": "No bookmarks"
+  },
+  "noFolders": {
+    "message": "No folders"
+  },
+  "noRuleMatched": {
+    "message": "No rule matched"
+  },
+  "noSnapshots": {
+    "message": "No local snapshots"
+  },
+  "notePlaceholder": {
+    "message": "Add what this bookmark is for or some context"
+  },
+  "noteTruncated": {
+    "message": "Note too long and was truncated"
+  },
+  "openManyTitle": {
+    "message": "Open tabs in bulk"
+  },
+  "openManyMessage": {
+    "message": "About to open $count tab(s) (limit $limit per run). Continue?"
+  },
+  "actionRewrite": {
+    "message": "Bulk rewrite"
+  },
+  "rewriteTitle": {
+    "message": "Bulk rewrite"
+  },
+  "rewriteHint": {
+    "message": "$count bookmark(s) selected; only entries that match the rule and actually change are written"
+  },
+  "rewriteTarget": {
+    "message": "Field"
+  },
+  "rewriteTargetTitle": {
+    "message": "Title"
+  },
+  "rewriteTargetUrl": {
+    "message": "URL"
+  },
+  "rewriteMode": {
+    "message": "Operation"
+  },
+  "rewritePrefix": {
+    "message": "Add prefix"
+  },
+  "rewriteSuffix": {
+    "message": "Add suffix"
+  },
+  "rewriteReplace": {
+    "message": "Find and replace"
+  },
+  "rewritePrefixText": {
+    "message": "Prefix"
+  },
+  "rewriteSuffixText": {
+    "message": "Suffix"
+  },
+  "rewriteSearch": {
+    "message": "Find"
+  },
+  "rewriteReplacement": {
+    "message": "Replace with"
+  },
+  "rewriteCaseSensitive": {
+    "message": "Match case"
+  },
+  "rewriteUrlOnlyReplace": {
+    "message": "URLs only support find and replace; the result must pass http/https validation"
+  },
+  "rewriteAffected": {
+    "message": "$count to update"
+  },
+  "rewriteSkippedCount": {
+    "message": "$count to skip"
+  },
+  "rewriteEmptyTitleWarn": {
+    "message": "$count will become an empty title"
+  },
+  "rewriteNoAffected": {
+    "message": "No entry matches the rule; adjust it and try again"
+  },
+  "rewritePreviewMore": {
+    "message": "$count more not listed in the preview"
+  },
+  "rewriteConfirmMessage": {
+    "message": "$count bookmark(s) will be modified"
+  },
+  "rewriteEmptyTitleConfirm": {
+    "message": "$count of them will become an empty title; please confirm"
+  },
+  "rewriteDone": {
+    "message": "Rewrite finished: $updated updated, $skipped skipped"
+  },
+  "rewriteResultTitle": {
+    "message": "Rewrite result"
+  },
+  "folderMoveTitle": {
+    "message": "Move folder"
+  },
+  "folderMoveMessage": {
+    "message": "Move \"$name\" to the target folder"
+  },
+  "folderMoveTarget": {
+    "message": "Target: $target"
+  },
+  "orphanTitle": {
+    "message": "Orphan tags and notes"
+  },
+  "orphanHint": {
+    "message": "These tags and notes no longer match any bookmark; you can clean them up"
+  },
+  "orphanClearTitle": {
+    "message": "Clear orphan notes"
+  },
+  "orphanClearMessage": {
+    "message": "Clear $count orphan note(s)?"
+  },
+  "orphanClearDetail": {
+    "message": "The bookmarks these notes belonged to are gone; clearing cannot be undone"
+  },
+  "orphanCleared": {
+    "message": "Orphan notes cleared"
+  },
+  "passwordChanged": {
+    "message": "Password changed"
+  },
+  "proxyHint": {
+    "message": "These domains are marked as \"proxy suspected\" when checks fail"
+  },
+  "recycleTitle": {
+    "message": "Recycle bin"
+  },
+  "recycleHint": {
+    "message": "Deleted bookmarks are kept here for a while"
+  },
+  "recycleEmpty": {
+    "message": "Recycle bin is empty"
+  },
+  "recycleCleared": {
+    "message": "Recycle bin emptied ($count item(s))"
+  },
+  "recycleClearTitle": {
+    "message": "Empty recycle bin"
+  },
+  "recycleClearMessage": {
+    "message": "Empty the recycle bin?"
+  },
+  "recycleClearDetail": {
+    "message": "This cannot be undone"
+  },
+  "recycleRecoverable": {
+    "message": "Can be restored from the recycle bin"
+  },
+  "recycleRestored": {
+    "message": "Restored $count item(s) from the recycle bin"
+  },
+  "restoreTitle": {
+    "message": "Confirm restore"
+  },
+  "restoreMessage": {
+    "message": "Restore $count bookmark(s)?"
+  },
+  "restoreLossHint": {
+    "message": "Restoring overwrites the current bookmark structure; consider backing up first"
+  },
+  "restoreSnapshotId": {
+    "message": "Snapshot before restore: $id"
+  },
+  "restoreDone": {
+    "message": "Restored $restored, re-bound tags $bound, orphan $orphan"
+  },
+  "restoreFailedRolledBack": {
+    "message": "Restore failed and was rolled back to the previous state (snapshot $id)"
+  },
+  "restoreFailedNoRollback": {
+    "message": "Restore failed and rollback also failed; use snapshot $id to restore manually"
+  },
+  "ruleCategoryPlaceholder": {
+    "message": "e.g. Dev tools"
+  },
+  "ruleImportDone": {
+    "message": "Imported $count rule(s)"
+  },
+  "rulePatternPlaceholder": {
+    "message": "e.g. github.com or tutorial"
+  },
+  "rulesTitle": {
+    "message": "Classification rules"
+  },
+  "rulesDragHint": {
+    "message": "Drag to reorder rules of the same type"
+  },
+  "rulesGroupEmpty": {
+    "message": "No rules of this type yet"
+  },
+  "rulesPriorityHint": {
+    "message": "Priority between types is fixed; dragging only reorders within a type"
+  },
+  "ruleTypeDomainExact": {
+    "message": "Exact domain"
+  },
+  "ruleTypeDomainContains": {
+    "message": "Domain contains"
+  },
+  "ruleTypeUrlKeyword": {
+    "message": "URL keyword"
+  },
+  "ruleTypeTitleKeyword": {
+    "message": "Title keyword"
+  },
+  "searchPlaceholder": {
+    "message": "Search titles, links, tags or notes"
+  },
+  "selectedCount": {
+    "message": "$count selected"
+  },
+  "settingsTitle": {
+    "message": "Settings"
+  },
+  "settingsGeneral": {
+    "message": "General"
+  },
+  "settingsWebdav": {
+    "message": "Nutstore WebDAV"
+  },
+  "settingsEncryption": {
+    "message": "Encryption"
+  },
+  "settingsProxy": {
+    "message": "Domains that may need a proxy"
+  },
+  "settingsSaved": {
+    "message": "Settings saved"
+  },
+  "snapshotDeleteTitle": {
+    "message": "Delete snapshot"
+  },
+  "snapshotDeleteMessage": {
+    "message": "Delete the snapshot from $time?"
+  },
+  "snapshotDeleted": {
+    "message": "Snapshot deleted"
+  },
+  "snapshotPreviewTitle": {
+    "message": "Snapshot contents"
+  },
+  "snapshotRecoverable": {
+    "message": "A snapshot was taken before this operation and can restore it"
+  },
+  "sortTitle": {
+    "message": "By title"
+  },
+  "sortDomain": {
+    "message": "By domain"
+  },
+  "sortDateAdded": {
+    "message": "By date added"
+  },
+  "sortAsc": {
+    "message": "Ascending"
+  },
+  "sortDesc": {
+    "message": "Descending"
+  },
+  "statsTitle": {
+    "message": "Overview"
+  },
+  "statsTotal": {
+    "message": "Total bookmarks"
+  },
+  "statsDuplicates": {
+    "message": "Duplicate groups"
+  },
+  "statsDead": {
+    "message": "Dead links"
+  },
+  "statsSuspect": {
+    "message": "Suspect links"
+  },
+  "statsEmptyFolders": {
+    "message": "Empty folders"
+  },
+  "statsTags": {
+    "message": "Tags"
+  },
+  "statsCategories": {
+    "message": "Top-level distribution"
+  },
+  "statsNoCategories": {
+    "message": "No category data yet"
+  },
+  "statusOk": {
+    "message": "OK"
+  },
+  "statusDead": {
+    "message": "Dead"
+  },
+  "statusSuspect": {
+    "message": "Suspect"
+  },
+  "statusUntested": {
+    "message": "Untested"
+  },
+  "statusUnsupported": {
+    "message": "Not supported"
+  },
+  "tagPlaceholder": {
+    "message": "Type a tag and press Enter or comma"
+  },
+  "tagHint": {
+    "message": "Up to $max tags per bookmark"
+  },
+  "tagDeleteTitle": {
+    "message": "Delete tag"
+  },
+  "tagDeleteMessage": {
+    "message": "Delete tag \"$tag\"?"
+  },
+  "tagDeleteDetail": {
+    "message": "The tag is removed from all bookmarks; notes are unaffected"
+  },
+  "tagDeleteDone": {
+    "message": "Tag removed from $count bookmark(s)"
+  },
+  "tagRenameDone": {
+    "message": "Renamed; $count bookmark(s) affected"
+  },
+  "tagsTitle": {
+    "message": "Tags"
+  },
+  "tagsHint": {
+    "message": "Tags live only inside BookVault and are not written back to browser bookmarks"
+  },
+  "tagsEmpty": {
+    "message": "No tags yet"
+  },
+  "themeSystem": {
+    "message": "Follow system"
+  },
+  "themeLight": {
+    "message": "Light"
+  },
+  "themeDark": {
+    "message": "Dark"
+  },
+  "titleApplyTitle": {
+    "message": "Apply new titles"
+  },
+  "titleApplyMessage": {
+    "message": "$count bookmark title(s) will change"
+  },
+  "titleApplyDetail": {
+    "message": "Changes are recorded in the undo log and can be undone once"
+  },
+  "titleApplied": {
+    "message": "Updated $updated title(s), $failed failed"
+  },
+  "titleRefreshNoChange": {
+    "message": "Titles are unchanged"
+  },
+  "undoTitle": {
+    "message": "Undo"
+  },
+  "undoMessage": {
+    "message": "Undo \"$action\"?"
+  },
+  "undoHint": {
+    "message": "Only the most recent operation can be undone"
+  },
+  "undoLatest": {
+    "message": "Last undoable: $action ($time)"
+  },
+  "undoEmpty": {
+    "message": "Nothing to undo"
+  },
+  "vaultCached": {
+    "message": "Key cached on this device"
+  },
+  "vaultMissing": {
+    "message": "No key stored on this device"
+  },
+  "vaultCleared": {
+    "message": "Local key cleared"
+  },
+  "webdavPasswordRisk": {
+    "message": "The app password is stored in plain text locally; avoid this on shared computers"
   }
 }

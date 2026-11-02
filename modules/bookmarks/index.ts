@@ -24,6 +24,17 @@ export interface BookmarkEntry {
   rootId: string;
 }
 
+/** 扁平化后的文件夹行，文件夹树 / 选择器 / 对话框共用（depth 用于缩进渲染） */
+export interface FolderRow {
+  node: BookmarkNode;
+  /** 祖先文件夹标题（不含根） */
+  path: string[];
+  /** 所属受管根 id */
+  rootId: string;
+  /** 相对受管根的层级，根下第一层为 0 */
+  depth: number;
+}
+
 /** 书签树索引：id → 节点、id → 父 id、受管根集合 */
 export interface TreeIndex {
   byId: Map<string, BookmarkNode>;
@@ -105,7 +116,10 @@ export function buildIndex(tree: BookmarkTree): TreeIndex {
 
   for (const group of topGroups(tree)) {
     walk(group);
-    if (group.id === MOBILE_ROOT_ID || group.title === '移动设备书签') {
+    if (
+      group.id === MOBILE_ROOT_ID ||
+      ROOT_TITLE_FALLBACK.mobile.some((title) => title === group.title)
+    ) {
       collectIds(group, mobileIds);
     }
   }
@@ -186,16 +200,13 @@ export function collectBookmarks(tree: BookmarkTree, index?: TreeIndex): Bookmar
 }
 
 /** 受管根下的全部文件夹（不含根本身、不含移动设备书签） */
-export function collectFolders(
-  tree: BookmarkTree,
-  index?: TreeIndex,
-): Array<{ node: BookmarkNode; path: string[]; rootId: string }> {
+export function collectFolders(tree: BookmarkTree, index?: TreeIndex): FolderRow[] {
   const resolved = index ?? buildIndex(tree);
-  const folders: Array<{ node: BookmarkNode; path: string[]; rootId: string }> = [];
+  const folders: FolderRow[] = [];
 
   const walk = (node: BookmarkNode, rootId: string, ancestors: string[]): void => {
     if (node.url !== undefined) return;
-    folders.push({ node, path: ancestors, rootId });
+    folders.push({ node, path: ancestors, rootId, depth: ancestors.length });
     for (const child of node.children ?? []) walk(child, rootId, [...ancestors, node.title]);
   };
 

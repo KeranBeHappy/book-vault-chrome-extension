@@ -46,6 +46,8 @@ export interface ParsedImport {
   proxyBlocklist: string[];
   /** 旧 bookmarks id → 归一化 URL（JSON 才有） */
   metaByOldId: Record<string, BookmarkMeta>;
+  /** 挂起的标签备注，key 为归一化 URL 的短 hash（JSON 才有，I1） */
+  orphanMeta: Record<string, BookmarkMeta>;
 }
 
 const HTML_ESCAPE: Record<string, string> = {
@@ -108,12 +110,13 @@ export function exportHtml(tree: BookmarkTree): string {
   return lines.join('\n');
 }
 
-/** 组装 JSON 导出的明文载荷（受管根子树 + 规则 + 代理清单 + 标签备注） */
+/** 组装 JSON 导出的明文载荷（受管根子树 + 规则 + 代理清单 + 标签备注 + 挂起备注） */
 export async function buildExportPayload(): Promise<{
   bookmarks: BookmarkTree;
   rules: CategoryRule[];
   proxyBlocklist: string[];
   bookmarkMeta: Record<string, BookmarkMeta>;
+  orphanMeta: Record<string, BookmarkMeta>;
 }> {
   const db = await readDb();
   const tree = await getTree();
@@ -127,6 +130,7 @@ export async function buildExportPayload(): Promise<{
     rules: db.rules,
     proxyBlocklist: db.proxyBlocklist,
     bookmarkMeta: db.bookmarkMeta,
+    orphanMeta: db.orphanMeta,
   };
 }
 
@@ -188,7 +192,8 @@ export function parseHtml(html: string): ParsedImport {
   }
 
   const nodes = root.kind === 'folder' ? root.children : [];
-  return { nodes, total, rules: [], proxyBlocklist: [], metaByOldId: {} };
+  // HTML 不携带标签备注与挂起记录（G1）
+  return { nodes, total, rules: [], proxyBlocklist: [], metaByOldId: {}, orphanMeta: {} };
 }
 
 /** 把 JSON 备份的树转成 ImportNode（保留旧 id 供 meta 重绑） */
@@ -208,9 +213,13 @@ function toImportNodes(tree: BookmarkTree): ImportNode[] {
 }
 
 /** 解析 JSON 备份（结构校验由 encrypt 模块负责，这里只转结构） */
-export function parseJson(
-  file: { bookmarks?: BookmarkTree; rules?: CategoryRule[]; proxyBlocklist?: string[]; bookmarkMeta?: Record<string, BookmarkMeta> },
-): ParsedImport {
+export function parseJson(file: {
+  bookmarks?: BookmarkTree;
+  rules?: CategoryRule[];
+  proxyBlocklist?: string[];
+  bookmarkMeta?: Record<string, BookmarkMeta>;
+  orphanMeta?: Record<string, BookmarkMeta>;
+}): ParsedImport {
   const nodes = toImportNodes(file.bookmarks ?? []);
   let total = 0;
   const count = (list: ImportNode[]): void => {
@@ -226,6 +235,7 @@ export function parseJson(
     rules: file.rules ?? [],
     proxyBlocklist: file.proxyBlocklist ?? [],
     metaByOldId: file.bookmarkMeta ?? {},
+    orphanMeta: file.orphanMeta ?? {},
   };
 }
 
@@ -401,7 +411,9 @@ export async function importBookmarks(
 
     // 标签备注：JSON 才处理；按旧 id → 新 id 直接绑定，未匹配进 orphanMeta
     const bookmarkMeta = { ...db.bookmarkMeta };
-    const orphanMeta = { ...db.orphanMeta };
+    // 随备份带回来的挂起记录先合并进来；同 hash 时以导入的为准（I1）
+    const importedOrphans = kind === 'json' ? parsed.orphanMeta : {};
+    const orphanMeta = { ...db.orphanMeta, ...importedOrphans };
     let boundMeta = 0;
     let orphanCount = 0;
 
@@ -427,13 +439,17 @@ export async function importBookmarks(
       }
     }
 
-    await applyPatch({
-      rules,
-      proxyBlocklist,
-      bookmarkMeta,
-      orphanMeta,
-      flags: { statsDirty: true },
-    });
+    // 导入会新增键（也可能把某个挂起项搬进 bookmarkMeta），整段替换最直观
+    await applyPatch(
+      {
+        rules,
+        proxyBlocklist,
+        bookmarkMeta,
+        orphanMeta,
+        flags: { statsDirty: true },
+      },
+      { replace: ['bookmarkMeta', 'orphanMeta'] },
+    );
 
     return {
       created,

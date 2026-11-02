@@ -6,6 +6,7 @@ import AppToast from '@/components/AppToast.vue';
 import BackupHistory from '@/components/BackupHistory.vue';
 import BookmarkDialog from '@/components/BookmarkDialog.vue';
 import BookmarkList from '@/components/BookmarkList.vue';
+import BulkRewriteDialog from '@/components/BulkRewriteDialog.vue';
 import DetailPanel from '@/components/DetailPanel.vue';
 import DuplicatePanel from '@/components/DuplicatePanel.vue';
 import FolderPicker from '@/components/FolderPicker.vue';
@@ -31,14 +32,16 @@ import { setLanguage, t, translateError } from '@/modules/i18n';
 import { buildCsv } from '@/modules/scanner';
 import { tagCounts } from '@/modules/tags';
 import { downloadText } from '@/modules/io';
-import { sendToBackground, type RestoreOutcome } from '@/shared/messages';
+import { sendToBackground, type RestoreOutcome, type RewriteItem } from '@/shared/messages';
 import { HTTP_LIMITS } from '@/shared/constants';
 import type {
   BookmarkNode,
   CsvRow,
+  LinkState,
   LinkStatus,
   ManagerView,
   RemoteBackupEntry,
+  RewriteResult,
   StatsSummary,
   UiState,
 } from '@/shared/types';
@@ -336,8 +339,10 @@ async function applyTitleRefresh(jobId: string): Promise<void> {
 /* 书签 / 文件夹操作                                                   */
 /* ------------------------------------------------------------------ */
 
-type DialogMode = 'createBookmark' | 'editBookmark' | 'prompt' | 'move' | null;
+type DialogMode = 'createBookmark' | 'editBookmark' | 'prompt' | 'move' | 'rewrite' | null;
 const dialog = ref<DialogMode>(null);
+/** 改写结果明细（A5：跳过项必须逐条列出） */
+const rewriteReport = ref<RewriteResult | null>(null);
 const dialogNode = ref<BookmarkNode | null>(null);
 const promptState = ref<{ title: string; value: string; resolve: (value: string | null) => void } | null>(
   null,
@@ -450,7 +455,8 @@ async function deleteFolder(node: BookmarkNode): Promise<void> {
     execute: async (snapshotId) => {
       const result = await sendToBackground({ type: 'folder:delete', id: node.id, snapshotId });
       await books.reload();
-      feedback.success(t('folderDeleted', { count: result.deleted }));
+      // 提示里的数量是「连带删除的书签数」，不是回收站条目数（R-03）
+      feedback.success(t('folderDeleted', { count }));
       return result;
     },
   });
@@ -493,6 +499,85 @@ async function submitMove(): Promise<void> {
       ui.clearSelection();
       await books.reload();
       feedback.success(t('movedDone', { moved: result.moved, skipped: result.skipped }));
+      return result;
+    },
+  });
+}
+
+/** 文件夹拖拽移动（A3）：目标合法性已在 FolderTree 内挡掉，这里只走快照 + 确认 */
+async function moveFolder(payload: { id: string; parentId: string }): Promise<void> {
+  const folder = books.folders.find((item) => item.node.id === payload.id);
+  if (!folder) return;
+  const targetPath = books.folderPaths[payload.parentId] ?? '';
+  await safe.run({
+    title: t('folderMoveTitle'),
+    message: t('folderMoveMessage', { name: folder.node.title || t('unnamedFolder') }),
+    details: [t('folderMoveTarget', { target: targetPath }), t('snapshotRecoverable')],
+    execute: async (snapshotId) => {
+      const result = await sendToBackground({
+        type: 'bm:move',
+        ids: [payload.id],
+        parentId: payload.parentId,
+        snapshotId,
+      });
+      await books.reload();
+      feedback.success(t('movedDone', { moved: result.moved, skipped: result.skipped }));
+      return result;
+    },
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* 批量改写标题 / URL（A5）                                             */
+/* ------------------------------------------------------------------ */
+
+/** 当前勾选的书签条目（改写对话框的输入） */
+const selectedEntries = computed(() =>
+  books.entries.filter((entry) => ui.selectedSet.has(entry.node.id)),
+);
+
+function openRewrite(): void {
+  if (ui.selection.length === 0) return;
+  dialog.value = 'rewrite';
+}
+
+/** 改写执行：对话框已算好最终值，这里只负责快照、二次确认与结果反馈 */
+async function submitRewrite(payload: {
+  items: RewriteItem[];
+  skipped: Array<{ id: string; title: string; reason: string }>;
+  emptyTitles: number;
+}): Promise<void> {
+  dialog.value = null;
+  if (payload.items.length === 0) return;
+
+  const details: string[] = [];
+  if (payload.skipped.length > 0) {
+    details.push(t('rewriteSkippedCount', { count: payload.skipped.length }));
+  }
+  if (payload.emptyTitles > 0) {
+    details.push(t('rewriteEmptyTitleConfirm', { count: payload.emptyTitles }));
+  }
+  details.push(t('snapshotRecoverable'));
+
+  await safe.run({
+    title: t('rewriteTitle'),
+    message: t('rewriteConfirmMessage', { count: payload.items.length }),
+    details,
+    // 会产生空标题时按危险操作处理（A5：改写为空标题必须给出确认警告）
+    danger: payload.emptyTitles > 0,
+    confirmText: t('actionApply'),
+    execute: async (snapshotId) => {
+      const result = await sendToBackground({
+        type: 'bm:rewrite',
+        items: payload.items,
+        snapshotId,
+      });
+      await books.reload();
+      // 前端预校验（如 URL 改成非 http/https）跳过的条目后端收不到，
+      // 必须在这里并入结果明细，否则用户看不到它们为什么没被改（R-14）
+      const skipped = [...payload.skipped, ...result.skipped];
+      feedback.success(t('rewriteDone', { updated: result.updated, skipped: skipped.length }));
+      if (skipped.length > 0) rewriteReport.value = { updated: result.updated, skipped };
       return result;
     },
   });
@@ -699,22 +784,12 @@ async function saveSettings(patch: Parameters<typeof dbStore.saveSettings>[0]): 
 
 async function setupEncryption(password: string): Promise<void> {
   try {
-    await sendToBackendEncrypt(password);
+    await sendToBackground({ type: 'encrypt:setup', password });
     await dbStore.load();
     feedback.success(t('encryptEnabledDone'));
   } catch (err) {
     feedback.error(translateError(err instanceof Error ? err.message : undefined));
   }
-}
-
-async function sendToBackendEncrypt(password: string) {
-  return sendToBackendRaw({ type: 'encrypt:setup', password });
-}
-
-async function sendToBackendRaw(
-  request: Parameters<typeof sendToBackground>[0] extends never ? never : { type: 'encrypt:setup'; password: string },
-) {
-  return sendToBackground(request);
 }
 
 async function changePassword(payload: { oldPassword: string; newPassword: string }): Promise<void> {
@@ -787,7 +862,11 @@ async function undoLast(): Promise<void> {
       );
       return;
     }
-    const outcome = await sendToBackendUndo(prepared.op.id, prepared.restorePreId);
+    const outcome = await sendToBackground({
+      type: 'oplog:undo',
+      opLogId: prepared.op.id,
+      restorePreId: prepared.restorePreId,
+    });
     reportRestore(outcome);
     await books.reload();
   } catch (err) {
@@ -795,10 +874,6 @@ async function undoLast(): Promise<void> {
   } finally {
     busy.value = false;
   }
-}
-
-async function sendToBackendUndo(opLogId: string, restorePreId: string) {
-  return sendToBackground({ type: 'oplog:undo', opLogId, restorePreId });
 }
 
 function reportRestore(outcome: RestoreOutcome): void {
@@ -899,6 +974,7 @@ const activeTags = computed(() => ui.tagFilter);
           @create="createFolder"
           @rename="renameFolder"
           @remove="deleteFolder"
+          @move="moveFolder"
         />
 
         <section class="bv-manager__content">
@@ -913,7 +989,7 @@ const activeTags = computed(() => ui.tagFilter);
             <select
               class="bv-select bv-toolbar__select"
               :value="ui.statusFilter"
-              @change="ui.setStatus(($event.target as HTMLSelectElement).value as LinkStatus | '')"
+              @change="ui.setStatus(($event.target as HTMLSelectElement).value as LinkState | '')"
             >
               <option value="">{{ t('filterAllStatus') }}</option>
               <option value="ok">{{ t('statusOk') }}</option>
@@ -1005,6 +1081,9 @@ const activeTags = computed(() => ui.tagFilter);
               <button class="bv-btn bv-btn--sm" type="button" @click="copySelection">
                 {{ t('actionCopyUrl') }}
               </button>
+              <button class="bv-btn bv-btn--sm" type="button" @click="openRewrite">
+                {{ t('actionRewrite') }}
+              </button>
               <button
                 class="bv-btn bv-btn--sm bv-btn--danger"
                 type="button"
@@ -1033,7 +1112,12 @@ const activeTags = computed(() => ui.tagFilter);
 
           <div v-if="undoTarget" class="bv-undo-bar">
             <span class="bv-hint">
-              {{ t('undoLatest', { action: t(`opAction_${undoTarget.action}`), time: '' }) }}
+              {{
+                t('undoLatest', {
+                  action: t(`opAction_${undoTarget.action}`),
+                  time: formatLocalStamp(undoTarget.createdAt),
+                })
+              }}
             </span>
             <button class="bv-btn bv-btn--sm" type="button" :disabled="busy" @click="undoLast">
               {{ t('actionUndo') }}
@@ -1132,6 +1216,43 @@ const activeTags = computed(() => ui.tagFilter);
       @close="dialog = null"
       @submit="submitBookmark"
     />
+
+    <!-- 批量改写（A5） -->
+    <BulkRewriteDialog
+      v-if="dialog === 'rewrite'"
+      :entries="selectedEntries"
+      @close="dialog = null"
+      @submit="submitRewrite"
+    />
+
+    <!-- 改写结果：跳过项必须逐条列出（A5） -->
+    <div v-if="rewriteReport" class="bv-mask" @click.self="rewriteReport = null">
+      <section class="bv-dialog" role="dialog" aria-modal="true">
+        <h2 class="bv-section-title">{{ t('rewriteResultTitle') }}</h2>
+        <p class="bv-hint">
+          {{
+            t('rewriteDone', {
+              updated: rewriteReport.updated,
+              skipped: rewriteReport.skipped.length,
+            })
+          }}
+        </p>
+        <ul class="bv-rewrite-report">
+          <li v-for="item in rewriteReport.skipped" :key="item.id" class="bv-rewrite-report__row">
+            <span class="bv-rewrite-report__title" :title="item.title">
+              {{ item.title || t('none') }}
+            </span>
+            <span class="bv-rewrite-report__reason">{{ translateError(item.reason) }}</span>
+          </li>
+        </ul>
+        <div class="bv-row">
+          <span class="bv-spacer" />
+          <button class="bv-btn" type="button" @click="rewriteReport = null">
+            {{ t('actionClose') }}
+          </button>
+        </div>
+      </section>
+    </div>
 
     <!-- 文本输入（文件夹命名） -->
     <div v-if="dialog === 'prompt' && promptState" class="bv-mask" @click.self="cancelPrompt">
@@ -1359,5 +1480,39 @@ const activeTags = computed(() => ui.tagFilter);
   border: 1px solid var(--bv-border);
   border-radius: var(--bv-radius-md);
   box-shadow: var(--bv-shadow-3);
+}
+
+/* 改写结果明细：标题与原因分两列，长标题省略但保留 title 提示 */
+.bv-rewrite-report {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.bv-rewrite-report__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--bv-space-2);
+  align-items: center;
+  padding: 4px var(--bv-space-2);
+  border-bottom: 1px solid var(--bv-border);
+}
+
+.bv-rewrite-report__title {
+  overflow: hidden;
+  color: var(--bv-text);
+  font-size: var(--bv-font-size-xs);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.bv-rewrite-report__reason {
+  color: var(--bv-danger);
+  font-size: var(--bv-font-size-xs);
 }
 </style>

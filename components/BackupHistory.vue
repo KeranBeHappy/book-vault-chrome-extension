@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
+import FolderPicker from '@/components/FolderPicker.vue';
+import {
+  buildIndex,
+  collectFolders,
+  getTree,
+  type FolderRow,
+  type ManagedRoot,
+} from '@/modules/bookmarks';
 import { t, translateError } from '@/modules/i18n';
 import { sendToBackground, type RestoreOutcome } from '@/shared/messages';
 import type {
   BookmarkNode,
+  ImportPreview,
   LocalDB,
   RemoteBackupEntry,
   SnapshotContent,
@@ -413,34 +422,13 @@ async function onImportFile(event: Event): Promise<void> {
       return;
     }
 
-    await safe.run({
-      title: t('importTitle'),
-      message: t('importMessage', { count: preview.importable, name: file.name }),
-      details: [
-        t('importDuplicates', { count: preview.duplicates }),
-        t('importInvalid', { count: preview.invalid }),
-        t('importRules', { count: preview.rules }),
-        t('importMeta', { count: preview.metaCount }),
-        t('importTargetHint'),
-      ],
-      confirmText: t('actionImport'),
-      execute: async (snapshotId) => {
-        const result = await sendToBackground({
-          type: 'io:import',
-          kind: importKind.value,
-          text,
-          options: { password },
-          snapshotId,
-        });
-        feedback.success(
-          t('importDone', {
-            created: result.created,
-            duplicates: result.duplicates,
-            invalid: result.invalid,
-          }),
-        );
-        return result;
-      },
+    // G2 / D-8：先让用户选落点，再走快照 + 二次确认
+    await openTargetPicker({
+      kind: importKind.value,
+      text,
+      password,
+      fileName: file.name,
+      preview,
     });
   } catch (err) {
     feedback.error(translateError(err instanceof Error ? err.message : undefined));
@@ -451,6 +439,89 @@ async function onImportFile(event: Event): Promise<void> {
 
 async function sendToBackendParse(kind: 'json' | 'html', text: string, password?: string) {
   return sendToBackground({ type: 'io:parse', kind, text, password });
+}
+
+/* ---------------- 导入落点选择（G2 / D-8） ---------------- */
+
+interface PendingImport {
+  kind: 'json' | 'html';
+  text: string;
+  password?: string;
+  fileName: string;
+  preview: ImportPreview;
+}
+
+const pendingImport = ref<PendingImport | null>(null);
+const targetPickerOpen = ref(false);
+const importTargetId = ref('');
+const importRoots = ref<ManagedRoot[]>([]);
+const importFolders = ref<FolderRow[]>([]);
+
+/** 目标文件夹展示名（确认框与提示里用） */
+const importTargetName = computed(() => {
+  const root = importRoots.value.find((item) => item.id === importTargetId.value);
+  if (root) return root.title;
+  const folder = importFolders.value.find((item) => item.node.id === importTargetId.value);
+  return folder?.node.title || t('unnamedFolder');
+});
+
+/** 打开落点选择：默认「其他书签」根，与 D-8 的默认行为一致 */
+async function openTargetPicker(pending: PendingImport): Promise<void> {
+  try {
+    const tree = await getTree();
+    const index = buildIndex(tree);
+    importRoots.value = index.roots;
+    importFolders.value = collectFolders(tree, index);
+    importTargetId.value = index.roots[1]?.id ?? index.roots[0]?.id ?? '';
+    pendingImport.value = pending;
+    targetPickerOpen.value = true;
+  } catch (err) {
+    feedback.error(translateError(err instanceof Error ? err.message : undefined));
+  }
+}
+
+function cancelTargetPicker(): void {
+  targetPickerOpen.value = false;
+  pendingImport.value = null;
+}
+
+/** 确认落点 → 快照 → 二次确认 → 写入（G2 两阶段的第二步） */
+async function confirmImport(): Promise<void> {
+  const pending = pendingImport.value;
+  const targetId = importTargetId.value;
+  if (!pending || !targetId) return;
+  targetPickerOpen.value = false;
+  pendingImport.value = null;
+
+  await safe.run({
+    title: t('importTitle'),
+    message: t('importMessage', { count: pending.preview.importable, name: pending.fileName }),
+    details: [
+      t('importDuplicates', { count: pending.preview.duplicates }),
+      t('importInvalid', { count: pending.preview.invalid }),
+      t('importRules', { count: pending.preview.rules }),
+      t('importMeta', { count: pending.preview.metaCount }),
+      t('importTarget', { target: importTargetName.value }),
+    ],
+    confirmText: t('actionImport'),
+    execute: async (snapshotId) => {
+      const result = await sendToBackground({
+        type: 'io:import',
+        kind: pending.kind,
+        text: pending.text,
+        options: { password: pending.password, targetFolderId: targetId },
+        snapshotId,
+      });
+      feedback.success(
+        t('importDone', {
+          created: result.created,
+          duplicates: result.duplicates,
+          invalid: result.invalid,
+        }),
+      );
+      return result;
+    },
+  });
 }
 </script>
 
@@ -689,6 +760,32 @@ async function sendToBackendParse(kind: 'json' | 'html', text: string, password?
           </button>
           <button class="bv-btn bv-btn--primary" type="button" @click="submitPassword">
             {{ t('actionConfirm') }}
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- 导入落点选择（G2 / D-8：先选目标文件夹，再快照 + 二次确认） -->
+    <div v-if="targetPickerOpen" class="bv-mask" @click.self="cancelTargetPicker">
+      <section class="bv-pwd" role="dialog" aria-modal="true">
+        <h3 class="bv-section-title">{{ t('importChooseTarget') }}</h3>
+        <p class="bv-hint">{{ t('importTargetHint') }}</p>
+        <FolderPicker v-model="importTargetId" :roots="importRoots" :folders="importFolders" />
+        <p v-if="pendingImport" class="bv-hint">
+          {{ t('importTarget', { target: importTargetName }) }}
+        </p>
+        <div class="bv-row">
+          <span class="bv-spacer" />
+          <button class="bv-btn" type="button" @click="cancelTargetPicker">
+            {{ t('actionCancel') }}
+          </button>
+          <button
+            class="bv-btn bv-btn--primary"
+            type="button"
+            :disabled="!importTargetId"
+            @click="confirmImport"
+          >
+            {{ t('actionImport') }}
           </button>
         </div>
       </section>

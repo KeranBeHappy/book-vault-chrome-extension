@@ -5,7 +5,7 @@
  * 校验三件事，任一不满足即以非 0 退出，让构建前置步骤卡住：
  * 1. 两种语言的 key 集合完全一致；
  * 2. 每条 message 非空；
- * 3. 同一条文案里的 `$1`/`$2` 占位符数量与编号一致（防止翻译漏参数）。
+ * 3. 同一条文案里的 `$count` / `$name` 等具名占位符集合与中文完全一致（防止翻译漏参数）。
  *
  * 校验通过后把两份 messages.json 写成 `modules/i18n/messages.generated.ts`，
  * 运行时直接 import（4.5 第 1 条：构建时打包为静态 JSON，运行时不用 getMessage）。
@@ -25,9 +25,9 @@ function loadMessages(locale) {
   return JSON.parse(readFileSync(file, 'utf8'));
 }
 
-/** 提取文案里的占位符编号集合，如 "$1 ... $2" → [1, 2] */
+/** 提取文案里的具名占位符集合，如 "$count / $name" → ['count', 'name'] */
 function placeholders(text) {
-  return [...text.matchAll(/\$(\d+)/g)].map((match) => Number(match[1])).sort((a, b) => a - b);
+  return [...text.matchAll(/\$([A-Za-z0-9_]+)/g)].map((match) => match[1]).sort();
 }
 
 const messages = Object.fromEntries(LOCALES.map((locale) => [locale, loadMessages(locale)]));

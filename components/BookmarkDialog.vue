@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 
-import { validateUrl, type ManagedRoot } from '@/modules/bookmarks';
+import { validateUrl, type FolderRow, type ManagedRoot } from '@/modules/bookmarks';
 import { t, translateError } from '@/modules/i18n';
 import type { BookmarkNode } from '@/shared/types';
 
 import FolderPicker from './FolderPicker.vue';
-
-interface FolderRow {
-  node: BookmarkNode;
-  path: string[];
-  rootId: string;
-  depth: number;
-}
 
 const props = defineProps<{
   mode: 'create' | 'edit';

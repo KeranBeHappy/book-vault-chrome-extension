@@ -68,7 +68,7 @@ async function loadTargets(job: JobState): Promise<string[]> {
  * 启动任务。同 kind 已有 running/queued 任务时直接复用（4.4）。
  */
 export async function startJob(kind: JobKind, ids: string[]): Promise<JobProgress> {
-  return withWriteLock(async () => {
+  const progress = await withWriteLock(async () => {
     const db = await readDb();
     const existing = Object.values(db.jobs).find(
       (job) => job.kind === kind && (job.status === 'running' || job.status === 'queued'),
@@ -98,6 +98,11 @@ export async function startJob(kind: JobKind, ids: string[]): Promise<JobProgres
     await ensureJobAlarm();
     return toProgress(job);
   });
+
+  // 锁外立刻跑第一批（2.3）：否则小任务要空等 1 分钟心跳才开始。
+  // 不 await：任务可能超出单次唤醒预算，立即返回进度让页面先渲染。
+  void runSlices();
+  return progress;
 }
 
 /** 取消任务：状态置 canceled，保留已完成结果（4.4） */

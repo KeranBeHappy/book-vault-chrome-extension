@@ -35,6 +35,8 @@ export interface PlainBackupPayload {
   rules: CategoryRule[];
   proxyBlocklist: string[];
   bookmarkMeta: Record<string, BookmarkMeta>;
+  /** 挂起的标签备注；旧备份没有该字段（I1 / D-5） */
+  orphanMeta?: Record<string, BookmarkMeta>;
 }
 
 /** 随机字节 */
@@ -317,7 +319,8 @@ export function assertBackupStructure(file: unknown): asserts file is BackupFile
       candidate.bookmarks !== undefined ||
       candidate.rules !== undefined ||
       candidate.proxyBlocklist !== undefined ||
-      candidate.bookmarkMeta !== undefined
+      candidate.bookmarkMeta !== undefined ||
+      candidate.orphanMeta !== undefined
     ) {
       throw new Error('errBackupStructure');
     }
@@ -438,6 +441,7 @@ export function buildPlainBackupFile(
     rules: payload.rules,
     proxyBlocklist: payload.proxyBlocklist,
     bookmarkMeta: payload.bookmarkMeta,
+    orphanMeta: payload.orphanMeta,
   };
 }
 

@@ -13,11 +13,19 @@ const ICONS = {
 
 /**
  * 扩展清单的唯一来源。
- * 需求依据：《Chrome书签管理扩展-开发需求文档-V1.1》2.2 节。
+ * 需求依据：《Chrome书签管理扩展-开发需求文档-V1.2》2.2 节。
  * 注意：WXT 不在源码里维护 manifest.json，构建时输出到 `.output/chrome-mv3/manifest.json`。
  */
 export default defineConfig({
   modules: ['@wxt-dev/module-vue'],
+
+  /**
+   * 关键：本仓库的 `modules/` 是领域代码（bookmarks/backup/...），与 WXT 的
+   * 「用户模块目录」约定同名。若不改指，WXT 会把每个 `modules/xxx/index.ts`
+   * 当扩展模块用 jiti 加载，而 jiti 不认 `@/` 别名，构建会直接失败。
+   * 指向一个不存在的目录即可让 WXT 跳过扫描。
+   */
+  modulesDir: 'wxt-user-modules',
   manifest: {
     name: '__MSG_extName__',
     description: '__MSG_extDesc__',
@@ -42,10 +50,11 @@ export default defineConfig({
 
     icons: ICONS,
 
-    // 刻意不设 default_title：留空时 Chrome 用 manifest.name（__MSG_extName__）
-    // 按浏览器语言解析；写死 __MSG 会被 WXT 在构建期固化成默认语言。
+    // 必须显式写 __MSG_extName__：留空时 WXT 会用 popup 页的 <title> 填充，
+    // 而它在 Windows 上按 GBK 解码 UTF-8 的 html，标题会变成乱码。
     action: {
       default_icon: ICONS,
+      default_title: '__MSG_extName__',
     },
 
     commands: {

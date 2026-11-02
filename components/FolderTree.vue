@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import { t } from '@/modules/i18n';
-import type { ManagedRoot } from '@/modules/bookmarks';
+import type { FolderRow, ManagedRoot } from '@/modules/bookmarks';
 import type { BookmarkNode } from '@/shared/types';
-
-interface FolderRow {
-  node: BookmarkNode;
-  path: string[];
-  rootId: string;
-  depth: number;
-}
 
 const props = defineProps<{
   roots: ManagedRoot[];
@@ -27,6 +20,7 @@ const emit = defineEmits<{
   (event: 'create', parentId: string): void;
   (event: 'rename', node: BookmarkNode): void;
   (event: 'remove', node: BookmarkNode): void;
+  (event: 'move', payload: { id: string; parentId: string }): void;
 }>();
 
 interface Row {
@@ -95,6 +89,81 @@ function onRename(row: Row): void {
 function onRemove(row: Row): void {
   if (row.node) emit('remove', row.node);
 }
+
+/* ---------------- 拖拽移动（A3） ---------------- */
+
+const dragId = ref<string | null>(null);
+const dropId = ref<string | null>(null);
+
+/** 文件夹 id → 父 id，用于判断「拖进自己的子孙」这种非法目标 */
+const parentOf = computed(() => {
+  const map = new Map<string, string>();
+  for (const folder of props.folders) {
+    const parentId = folder.node.parentId;
+    if (parentId) map.set(folder.node.id, parentId);
+  }
+  return map;
+});
+
+/** 目标是否是拖动项自身或其祖先链上的节点（bookmarks.move 会拒绝，提前挡掉） */
+function isSelfOrDescendant(targetId: string, sourceId: string): boolean {
+  if (targetId === sourceId) return true;
+  let current: string | undefined = targetId;
+  while (current) {
+    if (current === sourceId) return true;
+    current = parentOf.value.get(current);
+  }
+  return false;
+}
+
+/** 拖回原父级视为无变化：不弹确认，也避免把节点重排到末尾 */
+function isNoopDrop(row: Row, sourceId: string): boolean {
+  return parentOf.value.get(sourceId) === row.id;
+}
+
+function canDrop(row: Row): boolean {
+  if (!dragId.value) return false;
+  const sourceId = dragId.value;
+  return !isSelfOrDescendant(row.id, sourceId) && !isNoopDrop(row, sourceId);
+}
+
+function onDragStart(event: DragEvent, row: Row): void {
+  // 受管根不可拖：它们的父级是浏览器固定根，不允许改写层级
+  if (!row.node) {
+    event.preventDefault();
+    return;
+  }
+  dragId.value = row.id;
+  event.dataTransfer?.setData('text/plain', row.id);
+  if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragOver(event: DragEvent, row: Row): void {
+  if (!canDrop(row)) return;
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+  dropId.value = row.id;
+}
+
+function onDragLeave(row: Row): void {
+  if (dropId.value === row.id) dropId.value = null;
+}
+
+function onDrop(event: DragEvent, row: Row): void {
+  event.preventDefault();
+  const sourceId = dragId.value ?? event.dataTransfer?.getData('text/plain') ?? '';
+  const allowed =
+    Boolean(sourceId) && !isSelfOrDescendant(row.id, sourceId) && !isNoopDrop(row, sourceId);
+  dragId.value = null;
+  dropId.value = null;
+  if (!allowed) return;
+  emit('move', { id: sourceId, parentId: row.id });
+}
+
+function onDragEnd(): void {
+  dragId.value = null;
+  dropId.value = null;
+}
 </script>
 
 <template>
@@ -129,13 +198,24 @@ function onRemove(row: Row): void {
       <li v-for="row in rows" :key="row.id">
         <div
           class="bv-tree__row"
-          :class="{ 'is-active': selectedId === row.id, 'is-root': row.isRoot }"
+          :class="{
+            'is-active': selectedId === row.id,
+            'is-root': row.isRoot,
+            'is-drop': dropId === row.id,
+            'is-dragging': dragId === row.id,
+          }"
           :style="{ paddingLeft: `${8 + row.depth * 14}px` }"
           role="button"
           tabindex="0"
+          :draggable="Boolean(row.node)"
           @click="emit('select', row.id)"
           @keydown.enter.prevent="emit('select', row.id)"
           @dblclick="emit('toggle', row.id)"
+          @dragstart="onDragStart($event, row)"
+          @dragover="onDragOver($event, row)"
+          @dragleave="onDragLeave(row)"
+          @drop="onDrop($event, row)"
+          @dragend="onDragEnd"
         >
           <button
             v-if="row.hasChildren"
@@ -243,6 +323,17 @@ function onRemove(row: Row): void {
 
 .bv-tree__row.is-root .bv-tree__label {
   font-weight: 600;
+}
+
+/* 拖拽落点提示：虚线边框比整块高亮更轻，符合千苍主题的克制基调 */
+.bv-tree__row.is-drop {
+  outline: 1px dashed var(--bv-primary);
+  outline-offset: -1px;
+  background: var(--bv-primary-soft);
+}
+
+.bv-tree__row.is-dragging {
+  opacity: 0.5;
 }
 
 .bv-tree__caret {

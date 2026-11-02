@@ -6,18 +6,12 @@ import {
   collectFolders,
   getTree,
   type BookmarkEntry,
+  type FolderRow,
   type ManagedRoot,
   type TreeIndex,
 } from '@/modules/bookmarks';
 import { translateError } from '@/modules/i18n';
-import type { BookmarkMeta, BookmarkNode, BookmarkTree } from '@/shared/types';
-
-interface FolderRow {
-  node: BookmarkNode;
-  path: string[];
-  rootId: string;
-  depth: number;
-}
+import type { BookmarkMeta, BookmarkTree } from '@/shared/types';
 
 interface BookmarksState {
   tree: BookmarkTree | null;
@@ -64,10 +58,11 @@ export const useBookmarksStore = defineStore('bookmarks', {
 
     /** 文件夹 id → 展示路径 */
     folderPaths: (state): Record<string, string> => {
+      // 直接由 state.roots 现算根标题，避免 getter 之间互相引用导致 this 类型丢失
       const map: Record<string, string> = {};
       for (const root of state.roots) map[root.id] = root.title;
       for (const folder of state.folders) {
-        map[folder.node.id] = [state.rootTitles[folder.rootId], ...folder.path, folder.node.title]
+        map[folder.node.id] = [map[folder.rootId], ...folder.path, folder.node.title]
           .filter(Boolean)
           .join(' / ');
       }
@@ -85,10 +80,7 @@ export const useBookmarksStore = defineStore('bookmarks', {
         this.index = buildIndex(tree);
         this.roots = this.index.roots;
         this.entries = collectBookmarks(tree, this.index);
-        this.folders = collectFolders(tree, this.index).map((folder) => ({
-          ...folder,
-          depth: folder.path.length,
-        }));
+        this.folders = collectFolders(tree, this.index);
         this.error = null;
       } catch (err) {
         this.error = translateError(err instanceof Error ? err.message : undefined);

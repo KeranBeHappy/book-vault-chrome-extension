@@ -384,6 +384,24 @@ async function assertWritableNode(id: string): Promise<BookmarkNode> {
   return node;
 }
 
+/**
+ * 校验目标父节点可写（4.3）：
+ * 排除「移动设备书签」子树与浏览器固定根，避免往受保护区域写入。
+ * 受管根（书签栏 / 其他书签）本身可以作为父级。
+ */
+async function assertWritableParent(parentId: string): Promise<BookmarkNode> {
+  const tree = await getTree();
+  const index = buildIndex(tree);
+  if (index.mobileIds.has(parentId)) throw new Error('errMobileRoot');
+  const node = index.byId.get(parentId);
+  if (!node) throw new Error('errFolderMissing');
+  if (!isFolder(node)) throw new Error('errFolderMissing');
+  // 有父节点的都是普通文件夹；没有父节点且不是受管根的，就是不可写的固定根
+  const isManagedRoot = index.roots.some((root) => root.id === parentId);
+  if (!isManagedRoot && !index.parentOf.has(parentId)) throw new Error('errRootProtected');
+  return node;
+}
+
 /** 处理一条请求；抛错由外层包成失败响应 */
 async function handleRequest(req: BvRequest): Promise<unknown> {
   switch (req.type) {
@@ -435,8 +453,7 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
       const urlError = validateUrl(req.url);
       if (urlError) throw new Error(urlError);
       if (!req.title.trim()) throw new Error('errTitleEmpty');
-      const parent = await getNode(req.parentId);
-      if (!parent || !isFolder(parent)) throw new Error('errFolderMissing');
+      await assertWritableParent(req.parentId);
       const node = await createBookmark({
         parentId: req.parentId,
         title: req.title.trim(),
@@ -462,8 +479,7 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
     }
     case 'bm:move': {
       const snapshotId = await requireSnapshot(req.snapshotId);
-      const parent = await getNode(req.parentId);
-      if (!parent || !isFolder(parent)) throw new Error('errFolderMissing');
+      await assertWritableParent(req.parentId);
       let moved = 0;
       let skipped = 0;
       for (const id of req.ids) {
@@ -526,8 +542,7 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
     }
     case 'folder:create': {
       if (!req.title.trim()) throw new Error('errTitleEmpty');
-      const parent = await getNode(req.parentId);
-      if (!parent || !isFolder(parent)) throw new Error('errFolderMissing');
+      await assertWritableParent(req.parentId);
       const node = await createFolder({ parentId: req.parentId, title: req.title.trim() });
       await patchDb({ flags: { statsDirty: true } });
       return node;
@@ -627,8 +642,9 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
     case 'webdav:restore': {
       await requireSnapshot(req.restorePreId);
       const { payload } = await loadCloudBackup(req.fileName, req.password);
+      // 备份里的挂起备注要一起还原，不能再清空（D-5 / I1）
       const outcome = await restoreFromContent(
-        { ...payload, orphanMeta: {} } as SnapshotContent,
+        { ...payload, orphanMeta: payload.orphanMeta ?? {} } as SnapshotContent,
         req.restorePreId,
       );
       if (!outcome.failed) await logOp('restore', [], outcome.restorePreId);
@@ -703,6 +719,7 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
     /* ---------------- 标签收藏 ---------------- */
     case 'capture:apply': {
       const snapshotId = await requireSnapshot(req.snapshotId);
+      await assertWritableParent(req.parentId);
       const result = await captureItems(req.items, req.parentId, req.note);
       await logOp('capture', [], snapshotId);
       return result;
@@ -856,8 +873,12 @@ export default defineBackground(() => {
         collect(node);
         delete bookmarkMeta[id];
         delete linkStatus[id];
+        // 级联清理必须整段替换，否则被删的键会被合并语义保留下来（D-15）
         await withWriteLock(() =>
-          applyPatch({ bookmarkMeta, linkStatus, flags: { statsDirty: true } }),
+          applyPatch(
+            { bookmarkMeta, linkStatus, flags: { statsDirty: true } },
+            { replace: ['bookmarkMeta', 'linkStatus'] },
+          ),
         );
       } catch (err) {
         console.warn('[bg] onRemoved 处理失败', err);
@@ -871,7 +892,10 @@ export default defineBackground(() => {
         const db = await readDb();
         const linkStatus = { ...db.linkStatus };
         delete linkStatus[id];
-        await withWriteLock(() => applyPatch({ linkStatus, flags: { statsDirty: true } }));
+        // 标题/URL 变了，旧检测结果作废：必须整段替换才删得掉该 key
+        await withWriteLock(() =>
+          applyPatch({ linkStatus, flags: { statsDirty: true } }, { replace: ['linkStatus'] }),
+        );
       } catch (err) {
         console.warn('[bg] onChanged 处理失败', err);
       }

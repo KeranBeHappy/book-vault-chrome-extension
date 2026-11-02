@@ -83,7 +83,14 @@ async function request(
   config: WebDavSettings,
   method: string,
   url: string,
-  options: { body?: string; contentType?: string; timeoutSec?: number; retry?: boolean } = {},
+  options: {
+    body?: string;
+    contentType?: string;
+    timeoutSec?: number;
+    retry?: boolean;
+    /** 额外请求头，如 PROPFIND 的 `Depth`（E1/E2/E3 都依赖它） */
+    headers?: Record<string, string>;
+  } = {},
 ): Promise<DavResponse> {
   const timeoutSec = options.timeoutSec ?? 30;
   const attempts = options.retry ? WEBDAV_RETRY_DELAYS.length + 1 : 1;
@@ -99,6 +106,7 @@ async function request(
         headers: {
           Authorization: authHeader(config),
           ...(options.contentType ? { 'Content-Type': options.contentType } : {}),
+          ...(options.headers ?? {}),
         },
         body: options.body,
         credentials: 'omit',
@@ -151,6 +159,7 @@ export async function testConnection(config: WebDavSettings): Promise<WebDavTest
     const depth0 = await request(config, 'PROPFIND', url, {
       body: PROPFIND_BODY,
       contentType: 'application/xml; charset=utf-8',
+      headers: { Depth: '0' },
       timeoutSec: 15,
     });
     const code = classifyStatus(depth0.status);
@@ -172,6 +181,7 @@ export async function testConnection(config: WebDavSettings): Promise<WebDavTest
     const depth1 = await request(config, 'PROPFIND', url, {
       body: PROPFIND_BODY,
       contentType: 'application/xml; charset=utf-8',
+      headers: { Depth: '1' },
       timeoutSec: 20,
       retry: true,
     });
@@ -254,6 +264,8 @@ export async function listRemote(config: WebDavSettings): Promise<RemoteBackupEn
   const res = await request(config, 'PROPFIND', buildUrl(config), {
     body: PROPFIND_BODY,
     contentType: 'application/xml; charset=utf-8',
+    // 必须 Depth:1，否则只返回目录自身，云端备份列表会永远是空的
+    headers: { Depth: '1' },
     timeoutSec: 30,
     retry: true,
   });

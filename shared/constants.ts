@@ -224,6 +224,8 @@ export const MOBILE_ROOT_ID = '3';
 export const ROOT_TITLE_FALLBACK = {
   bar: ['书签栏', 'Bookmarks Bar', 'Bookmarks bar'],
   other: ['其他书签', 'Other Bookmarks', 'Other bookmarks'],
+  // 英文界面下移动设备根标题为 "Mobile Bookmarks"，只按中文标题匹配会漏
+  mobile: ['移动设备书签', 'Mobile Bookmarks', 'Mobile bookmarks'],
 } as const;
 
 /** 不可收藏的协议前缀（J1 过滤规则） */

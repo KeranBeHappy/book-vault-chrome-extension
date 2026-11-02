@@ -11,6 +11,10 @@
     "message": "打开签仓管理页",
     "description": "快捷键说明"
   },
+  "menuAddBookmark": {
+    "message": "收藏到签仓",
+    "description": "浏览器右键菜单项"
+  },
   "popupTitle": {
     "message": "签仓",
     "description": "Popup 标题"
@@ -23,8 +27,1352 @@
     "message": "收藏当前窗口标签",
     "description": "收藏小窗标题"
   },
+  "captureModeWindow": {
+    "message": "收藏当前窗口的标签页"
+  },
+  "captureModePage": {
+    "message": "收藏当前页面"
+  },
+  "captureSelected": {
+    "message": "已选 $count 条"
+  },
+  "captureExcludedHint": {
+    "message": "排除 $count 个不可收藏页面"
+  },
+  "captureDuplicateTag": {
+    "message": "已存在"
+  },
+  "captureNoteLabel": {
+    "message": "统一备注（可选）"
+  },
+  "captureNotePlaceholder": {
+    "message": "写入本次新增书签的备注"
+  },
+  "captureTargetLabel": {
+    "message": "目标文件夹"
+  },
+  "captureConfirmTitle": {
+    "message": "收藏标签页"
+  },
+  "captureConfirmMessage": {
+    "message": "将收藏 $count 条书签到「$folder」"
+  },
+  "captureResultTitle": {
+    "message": "收藏结果"
+  },
+  "captureResultCreated": {
+    "message": "新增 $count 条"
+  },
+  "captureResultDuplicates": {
+    "message": "跳过重复 $count 条"
+  },
+  "captureResultExcluded": {
+    "message": "排除 $count 个页面"
+  },
+  "captureResultFailed": {
+    "message": "失败 $count 条"
+  },
+  "captureEmpty": {
+    "message": "当前窗口没有可收藏的页面"
+  },
+  "captureCloseWindow": {
+    "message": "关闭窗口"
+  },
+  "captureLoading": {
+    "message": "正在读取标签页…"
+  },
   "placeholder": {
     "message": "骨架页：功能待实现",
     "description": "占位提示，实现后移除"
+  },
+  "loading": {
+    "message": "加载中…"
+  },
+  "none": {
+    "message": "无"
+  },
+  "yes": {
+    "message": "是"
+  },
+  "no": {
+    "message": "否"
+  },
+  "unnamedFolder": {
+    "message": "未命名文件夹"
+  },
+  "allBookmarks": {
+    "message": "全部书签"
+  },
+  "view_manager": {
+    "message": "书签管理"
+  },
+  "view_stats": {
+    "message": "统计"
+  },
+  "view_rules": {
+    "message": "规则"
+  },
+  "view_tags": {
+    "message": "标签"
+  },
+  "view_backup": {
+    "message": "备份"
+  },
+  "view_settings": {
+    "message": "设置"
+  },
+  "opAction_move": {
+    "message": "移动"
+  },
+  "opAction_delete": {
+    "message": "删除"
+  },
+  "opAction_rename": {
+    "message": "重命名"
+  },
+  "opAction_classify": {
+    "message": "分类"
+  },
+  "opAction_rewrite": {
+    "message": "改写链接"
+  },
+  "opAction_refreshTitle": {
+    "message": "刷新标题"
+  },
+  "opAction_import": {
+    "message": "导入"
+  },
+  "opAction_capture": {
+    "message": "收藏"
+  },
+  "opAction_restore": {
+    "message": "恢复"
+  },
+  "snapshotSource_manual": {
+    "message": "手动创建"
+  },
+  "snapshotSource_preOperation": {
+    "message": "操作前自动"
+  },
+  "snapshotSource_autoDaily": {
+    "message": "每日自动"
+  },
+  "snapshotSource_import": {
+    "message": "导入前"
+  },
+  "snapshotSource_restorePre": {
+    "message": "恢复前"
+  },
+  "actionApply": {
+    "message": "应用"
+  },
+  "actionApplyClassify": {
+    "message": "应用分类"
+  },
+  "actionBackupCloud": {
+    "message": "备份到云端"
+  },
+  "actionBackupLocal": {
+    "message": "仅备份到本地"
+  },
+  "actionCancel": {
+    "message": "取消"
+  },
+  "actionCaptureWindow": {
+    "message": "收藏当前窗口"
+  },
+  "actionChangePassword": {
+    "message": "修改密码"
+  },
+  "actionCheckLinks": {
+    "message": "死链检测"
+  },
+  "actionClassify": {
+    "message": "规则分类"
+  },
+  "actionClearFilter": {
+    "message": "清除筛选"
+  },
+  "actionClearOrphans": {
+    "message": "清空孤儿备注"
+  },
+  "actionClearRecycle": {
+    "message": "清空回收站"
+  },
+  "actionClearSelection": {
+    "message": "取消选择"
+  },
+  "actionClearVault": {
+    "message": "清除本机密钥"
+  },
+  "actionClose": {
+    "message": "关闭"
+  },
+  "actionConfirm": {
+    "message": "确定"
+  },
+  "actionCopyLink": {
+    "message": "复制链接"
+  },
+  "actionCopyUrl": {
+    "message": "复制 URL"
+  },
+  "actionDedupe": {
+    "message": "重复检测"
+  },
+  "actionDelete": {
+    "message": "删除"
+  },
+  "actionDisable": {
+    "message": "停用"
+  },
+  "actionEdit": {
+    "message": "编辑"
+  },
+  "actionEnable": {
+    "message": "启用"
+  },
+  "actionExpand": {
+    "message": "展开或收起"
+  },
+  "actionExportCsv": {
+    "message": "导出 CSV"
+  },
+  "actionExportHtml": {
+    "message": "导出 HTML"
+  },
+  "actionExportJson": {
+    "message": "导出 JSON"
+  },
+  "actionExportRules": {
+    "message": "导出规则"
+  },
+  "actionGeneratePreview": {
+    "message": "生成预览"
+  },
+  "actionGotoSettings": {
+    "message": "前往设置"
+  },
+  "actionImport": {
+    "message": "导入"
+  },
+  "actionImportHtml": {
+    "message": "导入 HTML"
+  },
+  "actionImportJson": {
+    "message": "导入 JSON"
+  },
+  "actionImportRules": {
+    "message": "导入规则"
+  },
+  "actionMerge": {
+    "message": "合并"
+  },
+  "actionMoveTo": {
+    "message": "移动到"
+  },
+  "actionNewBookmark": {
+    "message": "新建书签"
+  },
+  "actionNewFolder": {
+    "message": "新建文件夹"
+  },
+  "actionNewRule": {
+    "message": "新建规则"
+  },
+  "actionOpen": {
+    "message": "打开"
+  },
+  "actionOpenSelected": {
+    "message": "打开选中项"
+  },
+  "actionPreview": {
+    "message": "预览"
+  },
+  "actionRecompute": {
+    "message": "重新统计"
+  },
+  "actionRefresh": {
+    "message": "刷新"
+  },
+  "actionRefreshTitles": {
+    "message": "刷新标题"
+  },
+  "actionRename": {
+    "message": "重命名"
+  },
+  "actionRestore": {
+    "message": "恢复"
+  },
+  "actionSave": {
+    "message": "保存"
+  },
+  "actionScanEmpty": {
+    "message": "清理空文件夹"
+  },
+  "actionSelectAll": {
+    "message": "全选"
+  },
+  "actionStop": {
+    "message": "停止"
+  },
+  "actionTagsNote": {
+    "message": "标签与备注"
+  },
+  "actionTestConnection": {
+    "message": "测试连接"
+  },
+  "actionUndo": {
+    "message": "撤销"
+  },
+  "backupTitle": {
+    "message": "备份与恢复"
+  },
+  "backupLocalDone": {
+    "message": "已备份到本地"
+  },
+  "backupUploaded": {
+    "message": "已上传到云端：$name"
+  },
+  "bookmarkCreateTitle": {
+    "message": "新建书签"
+  },
+  "bookmarkEditTitle": {
+    "message": "编辑书签"
+  },
+  "bookmarkCreated": {
+    "message": "书签已创建"
+  },
+  "bookmarkSaved": {
+    "message": "书签已保存"
+  },
+  "bookmarkDeleteTitle": {
+    "message": "删除书签"
+  },
+  "bookmarkDeleteMessage": {
+    "message": "确认删除选中的 $count 条书签？"
+  },
+  "bookmarkDeleted": {
+    "message": "已删除 $count 条书签"
+  },
+  "classifyApplyTitle": {
+    "message": "应用分类结果"
+  },
+  "classifyApplyMessage": {
+    "message": "将按规则移动 $count 条书签"
+  },
+  "classifyApplied": {
+    "message": "已移动 $moved 条，失败 $invalid 条"
+  },
+  "classifyDiscardHint": {
+    "message": "分类后变空的原有文件夹会被删除"
+  },
+  "classifyImpact": {
+    "message": "预览：$total 条书签，将删除 $folders 个空文件夹"
+  },
+  "classifyManual": {
+    "message": "手动调整"
+  },
+  "classifyPreviewHint": {
+    "message": "预览结果可在下方手动调整，仅对本次生效"
+  },
+  "classifyPreviewTitle": {
+    "message": "分类预览"
+  },
+  "classifyRemovedFolders": {
+    "message": "将删除 $count 个已空的文件夹"
+  },
+  "clearVaultTitle": {
+    "message": "清除本机密钥"
+  },
+  "clearVaultMessage": {
+    "message": "确认清除本机缓存的密钥？之后解密备份需要重新输入密码。"
+  },
+  "clearVaultDetail": {
+    "message": "云端备份文件不受影响，只是本机不再记住密码。"
+  },
+  "cloudTitle": {
+    "message": "云端备份"
+  },
+  "cloudDeleted": {
+    "message": "云端备份已删除"
+  },
+  "cloudDeleteTitle": {
+    "message": "删除云端备份"
+  },
+  "cloudDeleteMessage": {
+    "message": "确认删除云端备份 $name？"
+  },
+  "cloudEmpty": {
+    "message": "云端暂无备份"
+  },
+  "cloudEncryptedOn": {
+    "message": "已加密"
+  },
+  "cloudEncryptedOff": {
+    "message": "未加密"
+  },
+  "cloudNotConfigured": {
+    "message": "尚未配置 WebDAV"
+  },
+  "cloudPasswordTitle": {
+    "message": "输入备份密码"
+  },
+  "cloudPasswordHint": {
+    "message": "密码只在本次操作中使用，不会写入磁盘"
+  },
+  "cloudRestoreTitle": {
+    "message": "从云端恢复"
+  },
+  "cloudRestoreMessage": {
+    "message": "从 $name 恢复 $count 条书签（$type）"
+  },
+  "colTitle": {
+    "message": "标题"
+  },
+  "colFolder": {
+    "message": "文件夹"
+  },
+  "colStatus": {
+    "message": "状态"
+  },
+  "colActions": {
+    "message": "操作"
+  },
+  "colCount": {
+    "message": "数量"
+  },
+  "colSource": {
+    "message": "来源"
+  },
+  "colTime": {
+    "message": "时间"
+  },
+  "colSize": {
+    "message": "大小"
+  },
+  "colFileName": {
+    "message": "文件名"
+  },
+  "copiedCount": {
+    "message": "已复制 $count 条链接"
+  },
+  "csvUrl": {
+    "message": "链接"
+  },
+  "csvDomain": {
+    "message": "域名"
+  },
+  "csvHttpStatus": {
+    "message": "HTTP 状态码"
+  },
+  "csvCheckedAt": {
+    "message": "检测时间"
+  },
+  "csvError": {
+    "message": "失败原因"
+  },
+  "csvProxySuspect": {
+    "message": "疑似需代理"
+  },
+  "csvNoData": {
+    "message": "当前列表为空，没有可导出的数据"
+  },
+  "davCode_ok": {
+    "message": "连接正常"
+  },
+  "davCode_unauthorized": {
+    "message": "认证失败（401），请检查账号与应用授权码"
+  },
+  "davCode_forbidden": {
+    "message": "无访问权限（403）"
+  },
+  "davCode_notFound": {
+    "message": "路径不存在（404），请检查远端目录"
+  },
+  "davCode_rateLimited": {
+    "message": "请求过于频繁（429），请稍后再试"
+  },
+  "davCode_serverError": {
+    "message": "服务端错误（5xx），请稍后再试"
+  },
+  "davCode_network": {
+    "message": "网络不可达，请检查网络或代理"
+  },
+  "davCode_unknown": {
+    "message": "未知错误"
+  },
+  "davTestMethod": {
+    "message": "方法"
+  },
+  "davTestUrl": {
+    "message": "最终地址"
+  },
+  "davTestStatus": {
+    "message": "状态码"
+  },
+  "davTestDuration": {
+    "message": "耗时"
+  },
+  "davTestOk": {
+    "message": "连接成功，远端 $count 个文件"
+  },
+  "davTestDetail": {
+    "message": "详情"
+  },
+  "dedupeTitle": {
+    "message": "重复书签"
+  },
+  "dedupeTabUrl": {
+    "message": "URL 重复（$count 组）"
+  },
+  "dedupeTabTitle": {
+    "message": "标题相似（$count 组）"
+  },
+  "dedupeEmpty": {
+    "message": "没有 URL 完全相同的书签"
+  },
+  "dedupeTitleEmpty": {
+    "message": "没有标题相似的书签"
+  },
+  "dedupeTitleHint": {
+    "message": "标题相似度阈值可在设置中调整"
+  },
+  "dedupeCount": {
+    "message": "本组 $count 条"
+  },
+  "dedupeSkipped": {
+    "message": "已跳过 $count 个过大的分组"
+  },
+  "dedupeFooterHint": {
+    "message": "勾选的保留，未勾选的将被删除，可用快照恢复"
+  },
+  "dedupeMergeTitle": {
+    "message": "合并重复书签"
+  },
+  "dedupeMergeMessage": {
+    "message": "确认删除 $count 条重复书签？"
+  },
+  "dedupeMergeHint": {
+    "message": "被删除书签的标签与备注不会自动迁移到保留项"
+  },
+  "dedupeMerged": {
+    "message": "已合并删除 $count 条"
+  },
+  "detailTitle": {
+    "message": "书签详情"
+  },
+  "detailEmpty": {
+    "message": "在上方列表中选择一条书签查看详情"
+  },
+  "emptyFolderTitle": {
+    "message": "清理空文件夹"
+  },
+  "emptyFolderMessage": {
+    "message": "确认删除 $count 个空文件夹？"
+  },
+  "emptyFolderNone": {
+    "message": "没有找到空文件夹"
+  },
+  "emptyFolderCleaned": {
+    "message": "已清理 $count 个空文件夹"
+  },
+  "encryptSetupTitle": {
+    "message": "设置备份密码"
+  },
+  "encryptChangeTitle": {
+    "message": "修改备份密码"
+  },
+  "encryptAck": {
+    "message": "我已了解上述风险"
+  },
+  "encryptNeedAck": {
+    "message": "请先勾选风险确认"
+  },
+  "encryptEnabledDone": {
+    "message": "已开启备份加密"
+  },
+  "encryptionScopeHint": {
+    "message": "加密只作用于云端备份与导出文件，本地快照仍为明文。"
+  },
+  "encryptionRiskHint": {
+    "message": "密码一旦丢失，云端加密备份将无法恢复，签仓不保存密码。"
+  },
+  "errUnknown": {
+    "message": "出现未知错误"
+  },
+  "errBackgroundUnavailable": {
+    "message": "后台服务无响应，请稍后重试或重新加载扩展"
+  },
+  "errStorageRead": {
+    "message": "读取本地数据失败"
+  },
+  "errStorageWrite": {
+    "message": "写入本地数据失败"
+  },
+  "errStorageTooLarge": {
+    "message": "数据超出浏览器存储配额"
+  },
+  "errSchemaTooNew": {
+    "message": "数据版本高于当前扩展版本，已进入只读模式，请更新扩展"
+  },
+  "errBookmarksRead": {
+    "message": "读取浏览器书签失败"
+  },
+  "errBookmarksWrite": {
+    "message": "写入浏览器书签失败"
+  },
+  "errUrlEmpty": {
+    "message": "链接不能为空"
+  },
+  "errUrlScheme": {
+    "message": "仅支持 http 与 https 链接"
+  },
+  "errUrlInvalid": {
+    "message": "链接格式不正确"
+  },
+  "errTitleEmpty": {
+    "message": "标题不能为空"
+  },
+  "errNodeMissing": {
+    "message": "书签不存在或已被删除"
+  },
+  "errFolderMissing": {
+    "message": "目标文件夹不存在或已被删除"
+  },
+  "errFolderNoUrl": {
+    "message": "该节点不是书签，无法改写链接"
+  },
+  "errNotFolder": {
+    "message": "该节点不是文件夹"
+  },
+  "errRootProtected": {
+    "message": "浏览器内置根目录不支持修改"
+  },
+  "errMobileRoot": {
+    "message": "移动设备书签根目录不支持修改"
+  },
+  "errNoManagedRoot": {
+    "message": "找不到受管根目录，请先在设置中选择"
+  },
+  "errSnapshotRequired": {
+    "message": "该操作需要先创建快照"
+  },
+  "errSnapshotMissing": {
+    "message": "快照不存在或已被删除"
+  },
+  "errSnapshotWrite": {
+    "message": "快照写入失败，操作已中止"
+  },
+  "errSnapshotCorrupted": {
+    "message": "快照数据校验失败，可能已损坏"
+  },
+  "errRestoreFailed": {
+    "message": "恢复过程中出错"
+  },
+  "errUndoSnapshotMissing": {
+    "message": "撤销所需的数据已丢失"
+  },
+  "errNothingToUndo": {
+    "message": "没有可撤销的操作"
+  },
+  "errRecycleItemMissing": {
+    "message": "回收站条目不存在"
+  },
+  "errJobNotFound": {
+    "message": "任务不存在或已结束"
+  },
+  "errTagEmpty": {
+    "message": "标签名不能为空"
+  },
+  "errDavUnauthorized": {
+    "message": "WebDAV 认证失败（401），请检查账号与应用授权码"
+  },
+  "errDavForbidden": {
+    "message": "WebDAV 拒绝访问（403），请检查授权码权限"
+  },
+  "errDavNotFound": {
+    "message": "WebDAV 路径不存在（404）"
+  },
+  "errDavRateLimited": {
+    "message": "WebDAV 请求过于频繁（429），请稍后再试"
+  },
+  "errDavServer": {
+    "message": "WebDAV 服务端错误（5xx）"
+  },
+  "errDavNetwork": {
+    "message": "无法连接 WebDAV 服务器，请检查网络"
+  },
+  "errDavUnknown": {
+    "message": "WebDAV 操作失败（未知错误）"
+  },
+  "errDavNameConflict": {
+    "message": "云端已存在同名文件"
+  },
+  "errWebdavDisabled": {
+    "message": "尚未启用 WebDAV"
+  },
+  "errWebdavConfig": {
+    "message": "WebDAV 配置不完整，请填写服务器、账号与授权码"
+  },
+  "errPasswordEmpty": {
+    "message": "密码不能为空"
+  },
+  "errPasswordRequired": {
+    "message": "该备份已加密，请输入密码"
+  },
+  "errPasswordWrong": {
+    "message": "密码错误，无法解密"
+  },
+  "errVaultMissing": {
+    "message": "本机没有保存密钥，请输入密码"
+  },
+  "errBackupStructure": {
+    "message": "备份文件格式不正确"
+  },
+  "errBackupCryptoMissing": {
+    "message": "备份文件缺少加密参数，无法解密"
+  },
+  "errBackupCorrupted": {
+    "message": "备份文件内容已损坏，无法解析"
+  },
+  "errRulePatternEmpty": {
+    "message": "匹配式不能为空"
+  },
+  "errRuleCategoryEmpty": {
+    "message": "目标分类不能为空"
+  },
+  "errRuleImportInvalid": {
+    "message": "规则文件格式不正确"
+  },
+  "errNoHttpBookmarks": {
+    "message": "当前范围内没有可检测的 http(s) 书签"
+  },
+  "fieldBookmarkTitle": {
+    "message": "标题"
+  },
+  "fieldBookmarkUrl": {
+    "message": "链接"
+  },
+  "fieldTargetFolder": {
+    "message": "目标文件夹"
+  },
+  "fieldTags": {
+    "message": "标签"
+  },
+  "fieldNote": {
+    "message": "备注"
+  },
+  "fieldTheme": {
+    "message": "主题"
+  },
+  "fieldLanguage": {
+    "message": "界面语言"
+  },
+  "fieldConcurrency": {
+    "message": "检测并发数"
+  },
+  "fieldTimeout": {
+    "message": "单条超时（秒）"
+  },
+  "fieldLocalKeep": {
+    "message": "本地快照保留份数"
+  },
+  "fieldCloudKeep": {
+    "message": "云端保留份数"
+  },
+  "fieldRecycleKeep": {
+    "message": "回收站保留条数"
+  },
+  "fieldSimilarity": {
+    "message": "标题相似度阈值"
+  },
+  "fieldAutoBackupHour": {
+    "message": "自动备份时间（整点）"
+  },
+  "fieldAutoBackupDaily": {
+    "message": "每日自动备份"
+  },
+  "fieldWebdavEnabled": {
+    "message": "启用 WebDAV"
+  },
+  "fieldWebdavServer": {
+    "message": "服务器地址"
+  },
+  "fieldWebdavUser": {
+    "message": "账号（邮箱）"
+  },
+  "fieldWebdavPassword": {
+    "message": "应用授权码"
+  },
+  "fieldWebdavDir": {
+    "message": "远端目录"
+  },
+  "fieldEncryptEnabled": {
+    "message": "开启备份加密"
+  },
+  "fieldRememberKey": {
+    "message": "在本机记住密钥"
+  },
+  "fieldOldPassword": {
+    "message": "原密码"
+  },
+  "fieldNewPassword": {
+    "message": "新密码"
+  },
+  "fieldRuleType": {
+    "message": "规则类型"
+  },
+  "fieldRulePattern": {
+    "message": "匹配式"
+  },
+  "fieldRuleCategory": {
+    "message": "目标分类"
+  },
+  "fieldEnabled": {
+    "message": "启用该规则"
+  },
+  "filterAllStatus": {
+    "message": "全部状态"
+  },
+  "filterTags": {
+    "message": "标签筛选"
+  },
+  "folderCreateTitle": {
+    "message": "新建文件夹"
+  },
+  "folderRenameTitle": {
+    "message": "重命名文件夹"
+  },
+  "folderCreated": {
+    "message": "文件夹已创建"
+  },
+  "folderDeleteTitle": {
+    "message": "删除文件夹"
+  },
+  "folderDeleteMessage": {
+    "message": "确认删除文件夹「$name」？"
+  },
+  "folderDeleteCount": {
+    "message": "将连带删除 $count 条书签"
+  },
+  "folderDeleted": {
+    "message": "已删除文件夹及其中 $count 条书签"
+  },
+  "foldersTitle": {
+    "message": "文件夹"
+  },
+  "folderTreeLabel": {
+    "message": "文件夹树"
+  },
+  "importChooseTarget": {
+    "message": "选择导入位置"
+  },
+  "importTarget": {
+    "message": "导入到「$target」"
+  },
+  "importTitle": {
+    "message": "确认导入"
+  },
+  "importMessage": {
+    "message": "将从「$name」导入 $count 条书签"
+  },
+  "importDuplicates": {
+    "message": "重复 $count 条将跳过"
+  },
+  "importInvalid": {
+    "message": "非法 $count 条将跳过"
+  },
+  "importRules": {
+    "message": "将导入 $count 条分类规则"
+  },
+  "importMeta": {
+    "message": "将恢复 $count 条标签与备注"
+  },
+  "importTargetHint": {
+    "message": "导入的书签会写入受管根目录"
+  },
+  "importNothing": {
+    "message": "没有可导入的内容（重复 $duplicates 条，非法 $invalid 条）"
+  },
+  "importDone": {
+    "message": "导入完成：新增 $created 条，跳过重复 $duplicates 条，非法 $invalid 条"
+  },
+  "importPasswordTitle": {
+    "message": "输入备份密码"
+  },
+  "ioTitle": {
+    "message": "导入导出"
+  },
+  "ioHint": {
+    "message": "支持签仓 JSON 备份与浏览器导出的 HTML 书签文件"
+  },
+  "jobLinkCheck": {
+    "message": "死链检测"
+  },
+  "jobTitleRefresh": {
+    "message": "标题刷新"
+  },
+  "jobStarted": {
+    "message": "已开始处理 $count 条"
+  },
+  "jobCanceled": {
+    "message": "任务已取消"
+  },
+  "labelEncrypted": {
+    "message": "已加密"
+  },
+  "labelPlain": {
+    "message": "未加密"
+  },
+  "labelUnknownFormat": {
+    "message": "未知格式"
+  },
+  "languageSystem": {
+    "message": "跟随系统"
+  },
+  "lastBackupError": {
+    "message": "上次备份失败"
+  },
+  "lastDailyBackup": {
+    "message": "上次自动备份：$date"
+  },
+  "pendingCloudBackup": {
+    "message": "有云端备份被跳过，稍后会自动补做"
+  },
+  "popupBackupDone": {
+    "message": "备份完成"
+  },
+  "popupBackupFailed": {
+    "message": "上次备份失败：$reason"
+  },
+  "popupBackupLocalDone": {
+    "message": "已生成本地快照"
+  },
+  "popupBackupNow": {
+    "message": "立即备份"
+  },
+  "popupBackupNever": {
+    "message": "还没有云备份"
+  },
+  "popupLastBackup": {
+    "message": "上次云备份：$time"
+  },
+  "popupLinkCheckStarted": {
+    "message": "已开始检测 $count 个链接"
+  },
+  "popupOpenManager": {
+    "message": "打开管理页"
+  },
+  "popupPendingCloud": {
+    "message": "有云端备份待重试"
+  },
+  "popupPendingVault": {
+    "message": "有加密备份等待输入密码，请到管理页处理"
+  },
+  "localSnapshotsTitle": {
+    "message": "本地快照"
+  },
+  "metaSaved": {
+    "message": "标签与备注已保存"
+  },
+  "moveTitle": {
+    "message": "移动到文件夹"
+  },
+  "moveMessage": {
+    "message": "将移动 $count 条书签到所选文件夹"
+  },
+  "movedDone": {
+    "message": "已移动 $moved 条，跳过 $skipped 条"
+  },
+  "noBookmarks": {
+    "message": "暂无书签"
+  },
+  "noFolders": {
+    "message": "暂无文件夹"
+  },
+  "noRuleMatched": {
+    "message": "未命中任何规则"
+  },
+  "noSnapshots": {
+    "message": "暂无本地快照"
+  },
+  "notePlaceholder": {
+    "message": "补充这条书签的用途或上下文"
+  },
+  "noteTruncated": {
+    "message": "备注过长，已截断"
+  },
+  "openManyTitle": {
+    "message": "批量打开标签页"
+  },
+  "openManyMessage": {
+    "message": "将打开 $count 个标签页（单次上限 $limit），确认继续？"
+  },
+  "actionRewrite": {
+    "message": "批量改写"
+  },
+  "rewriteTitle": {
+    "message": "批量改写"
+  },
+  "rewriteHint": {
+    "message": "已选 $count 条书签；只有符合规则且值真正变化的条目才会写入"
+  },
+  "rewriteTarget": {
+    "message": "改写对象"
+  },
+  "rewriteTargetTitle": {
+    "message": "标题"
+  },
+  "rewriteTargetUrl": {
+    "message": "链接"
+  },
+  "rewriteMode": {
+    "message": "操作方式"
+  },
+  "rewritePrefix": {
+    "message": "加前缀"
+  },
+  "rewriteSuffix": {
+    "message": "加后缀"
+  },
+  "rewriteReplace": {
+    "message": "查找替换"
+  },
+  "rewritePrefixText": {
+    "message": "前缀内容"
+  },
+  "rewriteSuffixText": {
+    "message": "后缀内容"
+  },
+  "rewriteSearch": {
+    "message": "查找"
+  },
+  "rewriteReplacement": {
+    "message": "替换为"
+  },
+  "rewriteCaseSensitive": {
+    "message": "区分大小写"
+  },
+  "rewriteUrlOnlyReplace": {
+    "message": "链接只支持查找替换，结果必须通过 http/https 校验"
+  },
+  "rewriteAffected": {
+    "message": "将修改 $count 条"
+  },
+  "rewriteSkippedCount": {
+    "message": "将跳过 $count 条"
+  },
+  "rewriteEmptyTitleWarn": {
+    "message": "有 $count 条会变为空标题"
+  },
+  "rewriteNoAffected": {
+    "message": "没有符合规则的条目，检查规则后再试"
+  },
+  "rewritePreviewMore": {
+    "message": "另有 $count 条未在预览中列出"
+  },
+  "rewriteConfirmMessage": {
+    "message": "将修改 $count 条书签"
+  },
+  "rewriteEmptyTitleConfirm": {
+    "message": "其中 $count 条会变成空标题，请确认"
+  },
+  "rewriteDone": {
+    "message": "改写完成：更新 $updated 条，跳过 $skipped 条"
+  },
+  "rewriteResultTitle": {
+    "message": "改写结果"
+  },
+  "folderMoveTitle": {
+    "message": "移动文件夹"
+  },
+  "folderMoveMessage": {
+    "message": "将「$name」移动到目标文件夹"
+  },
+  "folderMoveTarget": {
+    "message": "目标位置：$target"
+  },
+  "orphanTitle": {
+    "message": "孤儿标签与备注"
+  },
+  "orphanHint": {
+    "message": "以下标签与备注找不到对应书签，可手动清理"
+  },
+  "orphanClearTitle": {
+    "message": "清空孤儿备注"
+  },
+  "orphanClearMessage": {
+    "message": "确认清空 $count 条孤立备注？"
+  },
+  "orphanClearDetail": {
+    "message": "这些备注对应的书签已不存在，清空后无法恢复"
+  },
+  "orphanCleared": {
+    "message": "孤儿备注已清空"
+  },
+  "passwordChanged": {
+    "message": "密码已修改"
+  },
+  "proxyHint": {
+    "message": "以下域名判定失败时会被标记为「疑似需代理」"
+  },
+  "recycleTitle": {
+    "message": "回收站"
+  },
+  "recycleHint": {
+    "message": "删除的书签会在这里保留一段时间"
+  },
+  "recycleEmpty": {
+    "message": "回收站为空"
+  },
+  "recycleCleared": {
+    "message": "回收站已清空（$count 条）"
+  },
+  "recycleClearTitle": {
+    "message": "清空回收站"
+  },
+  "recycleClearMessage": {
+    "message": "确认清空回收站？"
+  },
+  "recycleClearDetail": {
+    "message": "清空后不可恢复"
+  },
+  "recycleRecoverable": {
+    "message": "可从回收站恢复"
+  },
+  "recycleRestored": {
+    "message": "已从回收站恢复 $count 条"
+  },
+  "restoreTitle": {
+    "message": "确认恢复"
+  },
+  "restoreMessage": {
+    "message": "确认恢复 $count 条书签？"
+  },
+  "restoreLossHint": {
+    "message": "恢复会覆盖当前书签结构，建议先备份"
+  },
+  "restoreSnapshotId": {
+    "message": "恢复前快照：$id"
+  },
+  "restoreDone": {
+    "message": "恢复完成：$restored 条，重绑标签 $bound 条，孤立 $orphan 条"
+  },
+  "restoreFailedRolledBack": {
+    "message": "恢复失败，已回滚到操作前状态（快照 $id）"
+  },
+  "restoreFailedNoRollback": {
+    "message": "恢复失败且回滚失败，请用快照 $id 手动恢复"
+  },
+  "ruleCategoryPlaceholder": {
+    "message": "例如：开发工具"
+  },
+  "ruleImportDone": {
+    "message": "已导入 $count 条规则"
+  },
+  "rulePatternPlaceholder": {
+    "message": "例如：github.com 或 教程"
+  },
+  "rulesTitle": {
+    "message": "分类规则"
+  },
+  "rulesDragHint": {
+    "message": "拖动可调整同类型规则的优先级"
+  },
+  "rulesGroupEmpty": {
+    "message": "该类型下暂无规则"
+  },
+  "rulesPriorityHint": {
+    "message": "类型之间优先级固定，拖动只能在同类型内调整"
+  },
+  "ruleTypeDomainExact": {
+    "message": "域名精确匹配"
+  },
+  "ruleTypeDomainContains": {
+    "message": "域名包含"
+  },
+  "ruleTypeUrlKeyword": {
+    "message": "链接关键词"
+  },
+  "ruleTypeTitleKeyword": {
+    "message": "标题关键词"
+  },
+  "searchPlaceholder": {
+    "message": "搜索标题、链接、标签或备注"
+  },
+  "selectedCount": {
+    "message": "已选 $count 项"
+  },
+  "settingsTitle": {
+    "message": "设置"
+  },
+  "settingsGeneral": {
+    "message": "通用"
+  },
+  "settingsWebdav": {
+    "message": "坚果云 WebDAV"
+  },
+  "settingsEncryption": {
+    "message": "加密"
+  },
+  "settingsProxy": {
+    "message": "疑似需代理的域名"
+  },
+  "settingsSaved": {
+    "message": "设置已保存"
+  },
+  "snapshotDeleteTitle": {
+    "message": "删除快照"
+  },
+  "snapshotDeleteMessage": {
+    "message": "确认删除 $time 的快照？"
+  },
+  "snapshotDeleted": {
+    "message": "快照已删除"
+  },
+  "snapshotPreviewTitle": {
+    "message": "快照内容"
+  },
+  "snapshotRecoverable": {
+    "message": "本次操作前已自动创建快照，可用它恢复"
+  },
+  "sortTitle": {
+    "message": "按标题"
+  },
+  "sortDomain": {
+    "message": "按域名"
+  },
+  "sortDateAdded": {
+    "message": "按添加时间"
+  },
+  "sortAsc": {
+    "message": "升序"
+  },
+  "sortDesc": {
+    "message": "降序"
+  },
+  "statsTitle": {
+    "message": "统计概览"
+  },
+  "statsTotal": {
+    "message": "书签总数"
+  },
+  "statsDuplicates": {
+    "message": "重复组"
+  },
+  "statsDead": {
+    "message": "死链"
+  },
+  "statsSuspect": {
+    "message": "存疑"
+  },
+  "statsEmptyFolders": {
+    "message": "空文件夹"
+  },
+  "statsTags": {
+    "message": "标签数"
+  },
+  "statsCategories": {
+    "message": "一级分类分布"
+  },
+  "statsNoCategories": {
+    "message": "暂无分类数据"
+  },
+  "statusOk": {
+    "message": "正常"
+  },
+  "statusDead": {
+    "message": "死链"
+  },
+  "statusSuspect": {
+    "message": "存疑"
+  },
+  "statusUntested": {
+    "message": "未检测"
+  },
+  "statusUnsupported": {
+    "message": "不支持检测"
+  },
+  "tagPlaceholder": {
+    "message": "输入标签后回车或逗号分隔"
+  },
+  "tagHint": {
+    "message": "每条书签最多 $max 个标签"
+  },
+  "tagDeleteTitle": {
+    "message": "删除标签"
+  },
+  "tagDeleteMessage": {
+    "message": "确认删除标签「$tag」？"
+  },
+  "tagDeleteDetail": {
+    "message": "该标签会从所有书签上移除，备注不受影响"
+  },
+  "tagDeleteDone": {
+    "message": "已从 $count 条书签移除该标签"
+  },
+  "tagRenameDone": {
+    "message": "已重命名，影响 $count 条书签"
+  },
+  "tagsTitle": {
+    "message": "标签管理"
+  },
+  "tagsHint": {
+    "message": "标签只保存在签仓本地，不写回浏览器书签"
+  },
+  "tagsEmpty": {
+    "message": "暂无标签"
+  },
+  "themeSystem": {
+    "message": "跟随系统"
+  },
+  "themeLight": {
+    "message": "浅色"
+  },
+  "themeDark": {
+    "message": "深色"
+  },
+  "titleApplyTitle": {
+    "message": "回填标题"
+  },
+  "titleApplyMessage": {
+    "message": "将修改 $count 条书签的标题"
+  },
+  "titleApplyDetail": {
+    "message": "修改会记入撤销日志，可撤销一次"
+  },
+  "titleApplied": {
+    "message": "已回填 $updated 条标题，失败 $failed 条"
+  },
+  "titleRefreshNoChange": {
+    "message": "标题没有变化"
+  },
+  "undoTitle": {
+    "message": "撤销"
+  },
+  "undoMessage": {
+    "message": "确认撤销「$action」？"
+  },
+  "undoHint": {
+    "message": "仅支持撤销最近一次操作"
+  },
+  "undoLatest": {
+    "message": "最近可撤销：$action（$time）"
+  },
+  "undoEmpty": {
+    "message": "暂无可撤销的操作"
+  },
+  "vaultCached": {
+    "message": "密钥已缓存在本机"
+  },
+  "vaultMissing": {
+    "message": "本机未保存密钥"
+  },
+  "vaultCleared": {
+    "message": "本机密钥已清除"
+  },
+  "webdavPasswordRisk": {
+    "message": "授权码以明文保存在本地，请勿在公用电脑上填写"
   }
 }
