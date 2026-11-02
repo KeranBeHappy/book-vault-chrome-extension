@@ -1,0 +1,27 @@
+{
+  "name": "book-vault-chrome-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "签仓（BookVault）· Chrome 书签管理扩展",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "compile": "vue-tsc --noEmit",
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "pinia": "^4.1.0",
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.7",
+    "@wxt-dev/module-vue": "^1.0.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.7",
+    "vue-tsc": "^3.3.14",
+    "wxt": "^0.21.5"
+  }
+}

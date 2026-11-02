@@ -1,0 +1,30 @@
+{
+  "extName": {
+    "message": "签仓",
+    "description": "扩展名称（显示在扩展管理页与商店）"
+  },
+  "extDesc": {
+    "message": "本地书签管理：批量改写、死链检测、规则分类、去重合并、标签备注、快照回滚与坚果云加密备份。",
+    "description": "扩展描述"
+  },
+  "cmdOpenManager": {
+    "message": "打开签仓管理页",
+    "description": "快捷键说明"
+  },
+  "popupTitle": {
+    "message": "签仓",
+    "description": "Popup 标题"
+  },
+  "managerTitle": {
+    "message": "书签管理",
+    "description": "管理页标题"
+  },
+  "captureTitle": {
+    "message": "收藏当前窗口标签",
+    "description": "收藏小窗标题"
+  },
+  "placeholder": {
+    "message": "骨架页：功能待实现",
+    "description": "占位提示，实现后移除"
+  }
+}

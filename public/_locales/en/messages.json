@@ -1,0 +1,30 @@
+{
+  "extName": {
+    "message": "BookVault",
+    "description": "Extension name (shown on the extensions page and store)"
+  },
+  "extDesc": {
+    "message": "Local bookmark management: bulk rewrite, dead-link scan, rule based classification, duplicate merge, tags and notes, snapshots and encrypted WebDAV backups.",
+    "description": "Extension description"
+  },
+  "cmdOpenManager": {
+    "message": "Open BookVault manager",
+    "description": "Keyboard shortcut description"
+  },
+  "popupTitle": {
+    "message": "BookVault",
+    "description": "Popup title"
+  },
+  "managerTitle": {
+    "message": "Bookmarks",
+    "description": "Manager page title"
+  },
+  "captureTitle": {
+    "message": "Save window tabs",
+    "description": "Capture window title"
+  },
+  "placeholder": {
+    "message": "Skeleton page: features not implemented yet",
+    "description": "Placeholder hint, remove after implementation"
+  }
+}

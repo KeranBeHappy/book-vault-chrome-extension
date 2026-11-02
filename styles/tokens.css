@@ -1,0 +1,91 @@
+/**
+ * 千苍主题设计令牌（文档 1.3）。
+ *
+ * 铁律：组件内禁止硬编码色值，一律引用这里的变量；浅色 / 深色两套通过
+ * `data-theme` 切换，切换时整套色调同步适配。
+ *
+ * 色值来源（不得自行发明）：
+ * - 主色 苍青 #4A605E；辅助色 浅苔绿 #869996
+ * - 浅色底 米灰 #F4F5F3 / 卡片 #FFFFFF；深色底 深苍灰 #262C2B / 卡片 #333A39
+ * - 浅色文字 #2F3635 / #687271；深色文字 #E7E7E8 / #A1AAA9
+ * - 状态色 正常 #597A75 / 存疑 #94805E / 无效 #8C5757
+ */
+
+:root {
+  /* 品牌色 */
+  --bv-primary: #4a605e;
+  --bv-primary-hover: #3f524f;
+  --bv-primary-active: #33423f;
+  --bv-primary-soft: rgb(74 96 94 / 12%);
+  --bv-primary-soft-strong: rgb(74 96 94 / 20%);
+  --bv-accent: #869996;
+  --bv-accent-soft: rgb(134 153 150 / 18%);
+
+  /* 状态色（压低饱和，保留辨识度） */
+  --bv-ok: #597a75;
+  --bv-ok-soft: rgb(89 122 117 / 14%);
+  --bv-suspect: #94805e;
+  --bv-suspect-soft: rgb(148 128 94 / 16%);
+  --bv-danger: #8c5757;
+  --bv-danger-soft: rgb(140 87 87 / 14%);
+
+  /* 几何与层次：圆角偏小，拒绝萌系；阴影轻薄 */
+  --bv-radius-sm: 6px;
+  --bv-radius-md: 8px;
+  --bv-radius-lg: 10px;
+  --bv-shadow-1: 0 1px 2px rgb(47 54 53 / 6%);
+  --bv-shadow-2: 0 2px 8px rgb(47 54 53 / 8%);
+  --bv-shadow-3: 0 4px 16px rgb(47 54 53 / 10%);
+
+  /* 间距 */
+  --bv-space-1: 4px;
+  --bv-space-2: 8px;
+  --bv-space-3: 12px;
+  --bv-space-4: 16px;
+  --bv-space-5: 20px;
+  --bv-space-6: 24px;
+
+  /* 字体：系统无衬线，行距宽松 */
+  --bv-font-body: 13px/1.7 -apple-system, 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+  --bv-font-mono: 12px/1.5 ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --bv-font-size-xs: 11px;
+  --bv-font-size-sm: 12px;
+  --bv-font-size-md: 13px;
+  --bv-font-size-lg: 15px;
+  --bv-font-size-xl: 18px;
+
+  /* 层级 */
+  --bv-z-dialog: 100;
+  --bv-z-toast: 200;
+}
+
+/* 浅色：米灰底 + 白卡片 */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bv-bg: #f4f5f3;
+  --bv-surface: #ffffff;
+  --bv-surface-hover: #eceeeb;
+  --bv-surface-sunken: #eef0ee;
+  --bv-border: #dcdfda;
+  --bv-border-strong: #c6cbc4;
+  --bv-text: #2f3635;
+  --bv-text-secondary: #687271;
+  --bv-text-tertiary: #8b9492;
+  --bv-overlay: rgb(47 54 53 / 32%);
+}
+
+/* 深色：深苍灰底 + 略亮卡片 */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bv-bg: #262c2b;
+  --bv-surface: #333a39;
+  --bv-surface-hover: #3b4342;
+  --bv-surface-sunken: #2c3231;
+  --bv-border: #3f4645;
+  --bv-border-strong: #4d5654;
+  --bv-text: #e7e7e8;
+  --bv-text-secondary: #a1aaa9;
+  --bv-text-tertiary: #8b9492;
+  --bv-overlay: rgb(12 16 15 / 56%);
+}

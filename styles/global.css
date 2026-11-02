@@ -1,0 +1,231 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bv-bg);
+  color: var(--bv-text);
+  font: var(--bv-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+a {
+  color: var(--bv-primary);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--bv-primary);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 通用控件（千苍风格：小圆角、轻阴影、低饱和）                          */
+/* ------------------------------------------------------------------ */
+
+.bv-btn {
+  display: inline-flex;
+  gap: var(--bv-space-1);
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 var(--bv-space-3);
+  color: var(--bv-text);
+  font-size: var(--bv-font-size-sm);
+  white-space: nowrap;
+  background: var(--bv-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-sm);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.bv-btn:hover:not(:disabled) {
+  background: var(--bv-surface-hover);
+  border-color: var(--bv-border-strong);
+}
+
+.bv-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bv-btn--primary {
+  color: #f7f8f7;
+  background: var(--bv-primary);
+  border-color: var(--bv-primary);
+}
+
+.bv-btn--primary:hover:not(:disabled) {
+  background: var(--bv-primary-hover);
+  border-color: var(--bv-primary-hover);
+}
+
+.bv-btn--danger {
+  color: var(--bv-danger);
+  border-color: var(--bv-danger);
+  background: transparent;
+}
+
+.bv-btn--danger:hover:not(:disabled) {
+  background: var(--bv-danger-soft);
+}
+
+.bv-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.bv-btn--ghost:hover:not(:disabled) {
+  background: var(--bv-surface-hover);
+}
+
+.bv-btn--sm {
+  height: 24px;
+  padding: 0 var(--bv-space-2);
+  font-size: var(--bv-font-size-xs);
+}
+
+.bv-input,
+.bv-select,
+.bv-textarea {
+  width: 100%;
+  min-height: 28px;
+  padding: 0 var(--bv-space-2);
+  color: var(--bv-text);
+  font: inherit;
+  font-size: var(--bv-font-size-sm);
+  background: var(--bv-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-sm);
+}
+
+.bv-textarea {
+  min-height: 96px;
+  padding: var(--bv-space-2);
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.bv-input:focus,
+.bv-select:focus,
+.bv-textarea:focus {
+  border-color: var(--bv-primary);
+  outline: none;
+}
+
+.bv-card {
+  padding: var(--bv-space-4);
+  background: var(--bv-surface);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+  box-shadow: var(--bv-shadow-1);
+}
+
+.bv-section-title {
+  margin-bottom: var(--bv-space-3);
+  font-size: var(--bv-font-size-md);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.bv-hint {
+  color: var(--bv-text-secondary);
+  font-size: var(--bv-font-size-xs);
+}
+
+.bv-muted {
+  color: var(--bv-text-secondary);
+}
+
+.bv-row {
+  display: flex;
+  gap: var(--bv-space-2);
+  align-items: center;
+}
+
+.bv-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bv-space-2);
+}
+
+.bv-spacer {
+  flex: 1;
+}
+
+.bv-chip {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  color: var(--bv-text-secondary);
+  font-size: var(--bv-font-size-xs);
+  background: var(--bv-accent-soft);
+  border-radius: var(--bv-radius-sm);
+}
+
+.bv-chip--primary {
+  color: var(--bv-primary);
+  background: var(--bv-primary-soft);
+}
+
+.bv-chip--ok {
+  color: var(--bv-ok);
+  background: var(--bv-ok-soft);
+}
+
+.bv-chip--suspect {
+  color: var(--bv-suspect);
+  background: var(--bv-suspect-soft);
+}
+
+.bv-chip--danger {
+  color: var(--bv-danger);
+  background: var(--bv-danger-soft);
+}
+
+.bv-divider {
+  height: 1px;
+  margin: var(--bv-space-3) 0;
+  background: var(--bv-border);
+}
+
+.bv-scroll {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bv-border-strong) transparent;
+}
+
+.bv-empty {
+  padding: var(--bv-space-6);
+  color: var(--bv-text-secondary);
+  font-size: var(--bv-font-size-sm);
+  text-align: center;
+}
