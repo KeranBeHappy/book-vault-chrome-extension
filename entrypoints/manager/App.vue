@@ -11,10 +11,10 @@ import DetailPanel from '@/components/DetailPanel.vue';
 import DuplicatePanel from '@/components/DuplicatePanel.vue';
 import FolderPicker from '@/components/FolderPicker.vue';
 import FolderTree from '@/components/FolderTree.vue';
-import RuleEditor from '@/components/RuleEditor.vue';
 import SettingsPanel from '@/components/SettingsPanel.vue';
 import StatsPanel from '@/components/StatsPanel.vue';
 import TagPanel from '@/components/TagPanel.vue';
+import TitleApplyDialog from '@/components/TitleApplyDialog.vue';
 import { useSafeAction } from '@/composables/useSafeAction';
 import { useStorageSync } from '@/composables/useStorageSync';
 import { useTheme } from '@/composables/useTheme';
@@ -26,7 +26,6 @@ import {
   validateUrl,
   type BookmarkEntry,
 } from '@/modules/bookmarks';
-import { computeImpact } from '@/modules/classifier';
 import { groupDuplicates } from '@/modules/dedupe';
 import { setLanguage, t, translateError } from '@/modules/i18n';
 import { buildCsv } from '@/modules/scanner';
@@ -43,6 +42,7 @@ import type {
   RemoteBackupEntry,
   RewriteResult,
   StatsSummary,
+  TitleApplyItem,
   UiState,
 } from '@/shared/types';
 import { formatLocalStamp } from '@/shared/util';
@@ -61,7 +61,7 @@ const safe = useSafeAction();
 useTheme(() => dbStore.settings?.theme ?? 'system');
 useStorageSync();
 
-const VIEWS: ManagerView[] = ['manager', 'stats', 'rules', 'tags', 'backup', 'settings'];
+const VIEWS: ManagerView[] = ['manager', 'stats', 'tags', 'backup', 'settings'];
 
 const booting = ref(true);
 const searchInput = ref('');
@@ -135,6 +135,17 @@ watch(searchInput, (value) => {
   }, 150);
 });
 
+// 书签被外部删除后，选中集里会残留已不存在的 id（会让「筛选外已选」计数虚高）
+watch(
+  () => books.entries,
+  (entries) => {
+    if (ui.selection.length === 0) return;
+    const alive = new Set(entries.map((entry) => entry.node.id));
+    const next = ui.selection.filter((id) => alive.has(id));
+    if (next.length !== ui.selection.length) ui.setSelection(next);
+  },
+);
+
 /* ------------------------------------------------------------------ */
 /* 列表筛选与排序                                                      */
 /* ------------------------------------------------------------------ */
@@ -203,6 +214,27 @@ const filtered = computed<BookmarkEntry[]>(() => {
 
 const selectedIds = computed(() => ui.selectedSet);
 
+/**
+ * 当前列表（筛选 + 搜索 + 文件夹范围之后）里被选中的条目。
+ * 批量操作一律以它为准：否则「筛选出死链后点删除」会把筛选外也已选中的书签一起删掉。
+ */
+const visibleSelectedEntries = computed(() =>
+  filtered.value.filter((entry) => ui.selectedSet.has(entry.node.id)),
+);
+
+const visibleSelectedIds = computed(() =>
+  visibleSelectedEntries.value.map((entry) => entry.node.id),
+);
+
+/** 已选中但落在当前筛选之外的条数（不参与任何批量操作，需在确认框里说明） */
+const hiddenSelectedCount = computed(() => ui.selection.length - visibleSelectedIds.value.length);
+
+/** 把外部传入的 id 收窄到当前可见范围，避免筛选外的选中被顺带处理 */
+function scopedIds(ids: string[]): string[] {
+  const visible = new Set(visibleSelectedIds.value);
+  return ids.filter((id) => visible.has(id));
+}
+
 const currentMeta = computed(() =>
   ui.detailId ? metaMap.value[ui.detailId] : undefined,
 );
@@ -265,8 +297,10 @@ const runningJobs = computed(() =>
 );
 
 async function startJob(kind: 'linkCheck' | 'titleRefresh'): Promise<void> {
-  const pool = ui.selection.length > 0
-    ? books.entries.filter((entry) => ui.selection.includes(entry.node.id))
+  // 选中项优先，但只取当前列表可见的；没有可见选中就跑当前筛选结果
+  const picked = scopedIds(ui.selection);
+  const pool = picked.length > 0
+    ? books.entries.filter((entry) => picked.includes(entry.node.id))
     : filtered.value;
   const ids = pool.filter((entry) => isHttpUrl(entry.node.url)).map((entry) => entry.node.id);
   if (ids.length === 0) {
@@ -311,27 +345,73 @@ watch(
 async function applyTitleRefresh(jobId: string): Promise<void> {
   try {
     const results = await sendToBackground({ type: 'job:results', jobId });
+    const fetched = Object.keys(results).length;
+    const failed = dbStore.jobs[jobId]?.failed ?? 0;
     const changed = Object.entries(results).filter(([id, title]) => {
       const entry = books.entries.find((item) => item.node.id === id);
       return entry && entry.node.title !== title.trim() && title.trim().length > 0;
     });
     if (changed.length === 0) {
-      feedback.toast(t('titleRefreshNoChange'));
+      // 「一条都没抓到」和「抓到了但标题没变」必须分开提示，否则失败会被说成没变化
+      if (fetched === 0 && failed > 0) {
+        feedback.error(t('titleRefreshFailed', { count: failed }));
+      } else if (failed > 0) {
+        feedback.toast(t('titleRefreshDoneNoChangeFailed', { failed }));
+      } else {
+        feedback.toast(t('titleRefreshDoneNoChange'));
+      }
       return;
     }
-    await safe.run({
-      title: t('titleApplyTitle'),
-      message: t('titleApplyMessage', { count: changed.length }),
-      details: [t('titleApplyDetail')],
-      confirmText: t('actionApply'),
-      execute: async (snapshotId) => {
-        const result = await sendToBackground({ type: 'title:apply', jobId, snapshotId });
-        feedback.success(t('titleApplied', { updated: result.updated, failed: result.failed }));
-        return result;
-      },
-    });
+    // 不再「确认一次全替换」：把每条前后对比交给弹窗，由用户选单条 / 勾选 / 全部
+    titleApplyJobId.value = jobId;
+    titleApplyFailed.value = failed;
+    titleApplyItems.value = changed
+      .map(([id, title]) => {
+        const entry = books.entries.find((item) => item.node.id === id);
+        return {
+          id,
+          url: entry?.node.url ?? '',
+          before: entry?.node.title ?? '',
+          after: title.trim(),
+        };
+      })
+      .filter((item) => item.before !== item.after);
+    dialog.value = 'titleApply';
   } catch (err) {
     feedback.error(translateError(err instanceof Error ? err.message : undefined));
+  }
+}
+
+/** 把选中的标题写入书签：每次替换单独生成快照，撤销日志可逐次回退 */
+async function applyTitleItems(ids: string[]): Promise<void> {
+  const jobId = titleApplyJobId.value;
+  if (!jobId || ids.length === 0) return;
+  titleApplyBusy.value = true;
+  try {
+    const snapshot = await sendToBackground({
+      type: 'snapshot:create',
+      source: 'preOperation',
+      note: t('titleApplyTitle'),
+    });
+    const result = await sendToBackground({
+      type: 'title:apply',
+      jobId,
+      snapshotId: snapshot.id,
+      ids,
+    });
+    await books.reload();
+    // 成功写入的从列表移除，剩余条目留在弹窗里继续处理
+    const applied = new Set(result.appliedIds);
+    titleApplyItems.value = titleApplyItems.value.filter((item) => !applied.has(item.id));
+    feedback.success(t('titleApplied', { updated: result.updated, failed: result.failed }));
+    if (titleApplyItems.value.length === 0) {
+      dialog.value = null;
+      titleApplyJobId.value = null;
+    }
+  } catch (err) {
+    feedback.error(translateError(err instanceof Error ? err.message : undefined));
+  } finally {
+    titleApplyBusy.value = false;
   }
 }
 
@@ -339,8 +419,21 @@ async function applyTitleRefresh(jobId: string): Promise<void> {
 /* 书签 / 文件夹操作                                                   */
 /* ------------------------------------------------------------------ */
 
-type DialogMode = 'createBookmark' | 'editBookmark' | 'prompt' | 'move' | 'rewrite' | null;
+type DialogMode =
+  | 'createBookmark'
+  | 'editBookmark'
+  | 'prompt'
+  | 'move'
+  | 'rewrite'
+  | 'titleApply'
+  | null;
 const dialog = ref<DialogMode>(null);
+
+/** 标题回填弹窗：待替换列表（前后对比）、抓取失败数、所属任务 id */
+const titleApplyJobId = ref<string | null>(null);
+const titleApplyItems = ref<TitleApplyItem[]>([]);
+const titleApplyFailed = ref(0);
+const titleApplyBusy = ref(false);
 /** 改写结果明细（A5：跳过项必须逐条列出） */
 const rewriteReport = ref<RewriteResult | null>(null);
 const dialogNode = ref<BookmarkNode | null>(null);
@@ -462,12 +555,18 @@ async function deleteFolder(node: BookmarkNode): Promise<void> {
   });
 }
 
-async function deleteBookmarks(ids: string[]): Promise<void> {
+async function deleteBookmarks(rawIds: string[]): Promise<void> {
+  // 作用域收窄：只删当前列表可见的选中项（筛选外的选中不动）
+  const ids = scopedIds(rawIds);
   if (ids.length === 0) return;
+  const details = [t('recycleRecoverable')];
+  if (hiddenSelectedCount.value > 0) {
+    details.unshift(t('selectionHiddenHint', { count: hiddenSelectedCount.value }));
+  }
   await safe.run({
     title: t('bookmarkDeleteTitle'),
     message: t('bookmarkDeleteMessage', { count: ids.length }),
-    details: [t('recycleRecoverable')],
+    details,
     danger: true,
     execute: async (snapshotId) => {
       const result = await sendToBackground({ type: 'bm:delete', ids, snapshotId });
@@ -479,7 +578,9 @@ async function deleteBookmarks(ids: string[]): Promise<void> {
   });
 }
 
-function openMove(ids: string[]): void {
+function openMove(rawIds: string[]): void {
+  // 与删除同样收窄到当前列表可见范围
+  const ids = scopedIds(rawIds);
   if (ids.length === 0) return;
   moveIds.value = ids;
   moveTarget.value = defaultFolderId();
@@ -491,9 +592,14 @@ async function submitMove(): Promise<void> {
   const parentId = moveTarget.value;
   dialog.value = null;
   if (!parentId || ids.length === 0) return;
+  const details =
+    hiddenSelectedCount.value > 0
+      ? [t('selectionHiddenHint', { count: hiddenSelectedCount.value })]
+      : [];
   await safe.run({
     title: t('moveTitle'),
     message: t('moveMessage', { count: ids.length }),
+    details,
     execute: async (snapshotId) => {
       const result = await sendToBackground({ type: 'bm:move', ids, parentId, snapshotId });
       ui.clearSelection();
@@ -531,13 +637,11 @@ async function moveFolder(payload: { id: string; parentId: string }): Promise<vo
 /* 批量改写标题 / URL（A5）                                             */
 /* ------------------------------------------------------------------ */
 
-/** 当前勾选的书签条目（改写对话框的输入） */
-const selectedEntries = computed(() =>
-  books.entries.filter((entry) => ui.selectedSet.has(entry.node.id)),
-);
+/** 当前勾选的书签条目（改写对话框的输入）：只取当前列表可见的 */
+const selectedEntries = computed(() => visibleSelectedEntries.value);
 
 function openRewrite(): void {
-  if (ui.selection.length === 0) return;
+  if (visibleSelectedIds.value.length === 0) return;
   dialog.value = 'rewrite';
 }
 
@@ -601,8 +705,7 @@ async function openMany(urls: string[]): Promise<void> {
 }
 
 async function copySelection(): Promise<void> {
-  const urls = books.entries
-    .filter((entry) => ui.selectedSet.has(entry.node.id))
+  const urls = visibleSelectedEntries.value
     .map((entry) => entry.node.url)
     .filter((url): url is string => Boolean(url));
   if (urls.length === 0) return;
@@ -631,7 +734,7 @@ async function saveMeta(meta: { tags: string[]; note: string }): Promise<void> {
 }
 
 /* ------------------------------------------------------------------ */
-/* 空文件夹清理（A8）/ 重复合并（F）/ 分类写回（C3）                    */
+/* 空文件夹清理（A8）/ 重复合并（F）                                   */
 /* ------------------------------------------------------------------ */
 
 async function scanEmptyFolders(): Promise<void> {
@@ -675,30 +778,6 @@ async function mergeDuplicates(payload: { keepIds: string[]; removeIds: string[]
       });
       await books.reload();
       feedback.success(t('dedupeMerged', { count: result.deleted }));
-      return result;
-    },
-  });
-}
-
-async function applyClassification(items: Array<{ bookmarkId: string; category: string }>): Promise<void> {
-  if (!books.tree) return;
-  const impact = computeImpact(books.tree, items);
-  await safe.run({
-    title: t('classifyApplyTitle'),
-    message: t('classifyApplyMessage', { count: items.length }),
-    details: [
-      t('classifyRemovedFolders', { count: impact.removedFolders }),
-      t('classifyDiscardHint'),
-      t('snapshotRecoverable'),
-    ],
-    danger: true,
-    confirmText: t('actionApply'),
-    execute: async (snapshotId) => {
-      const result = await sendToBackground({ type: 'classify:apply', items, snapshotId });
-      await books.reload();
-      feedback.success(
-        t('classifyApplied', { moved: result.moved, invalid: result.invalid }),
-      );
       return result;
     },
   });
@@ -904,8 +983,17 @@ function viewLabel(view: ManagerView): string {
   return t(`view_${view}`);
 }
 
-function toggleAll(ids: string[]): void {
-  ui.setSelection(ids);
+/**
+ * 列表头全选：只在当前筛选结果内增删，其它筛选下已选中的条目保持不动。
+ * （直接 setSelection 会把跨筛选累积的选择一起清掉，容易误删）
+ */
+function toggleAll(payload: { ids: string[]; checked: boolean }): void {
+  const next = new Set(ui.selection);
+  for (const id of payload.ids) {
+    if (payload.checked) next.add(id);
+    else next.delete(id);
+  }
+  ui.setSelection([...next]);
 }
 
 function jobPercent(done: number, total: number): number {
@@ -1043,9 +1131,6 @@ const activeTags = computed(() => ui.tagFilter);
             <button class="bv-btn bv-btn--sm" type="button" @click="startJob('titleRefresh')">
               {{ t('actionRefreshTitles') }}
             </button>
-            <button class="bv-btn bv-btn--sm" type="button" @click="ui.setView('rules')">
-              {{ t('actionClassify') }}
-            </button>
             <button class="bv-btn bv-btn--sm" type="button" @click="showDedupe = true">
               {{ t('actionDedupe') }}
             </button>
@@ -1058,23 +1143,17 @@ const activeTags = computed(() => ui.tagFilter);
 
             <span class="bv-spacer" />
 
-            <template v-if="ui.selection.length > 0">
+            <template v-if="visibleSelectedIds.length > 0">
               <span class="bv-chip bv-chip--primary">
-                {{ t('selectedCount', { count: ui.selection.length }) }}
+                {{ t('selectedCount', { count: visibleSelectedIds.length }) }}
               </span>
-              <button class="bv-btn bv-btn--sm" type="button" @click="openMove(ui.selection)">
+              <button class="bv-btn bv-btn--sm" type="button" @click="openMove(visibleSelectedIds)">
                 {{ t('actionMoveTo') }}
               </button>
               <button
                 class="bv-btn bv-btn--sm"
                 type="button"
-                @click="
-                  openMany(
-                    books.entries
-                      .filter((entry) => ui.selectedSet.has(entry.node.id))
-                      .map((entry) => entry.node.url ?? ''),
-                  )
-                "
+                @click="openMany(visibleSelectedEntries.map((entry) => entry.node.url ?? ''))"
               >
                 {{ t('actionOpenSelected') }}
               </button>
@@ -1087,7 +1166,7 @@ const activeTags = computed(() => ui.tagFilter);
               <button
                 class="bv-btn bv-btn--sm bv-btn--danger"
                 type="button"
-                @click="deleteBookmarks(ui.selection)"
+                @click="deleteBookmarks(visibleSelectedIds)"
               >
                 {{ t('actionDelete') }}
               </button>
@@ -1095,6 +1174,9 @@ const activeTags = computed(() => ui.tagFilter);
                 {{ t('actionClearSelection') }}
               </button>
             </template>
+            <span v-if="hiddenSelectedCount > 0" class="bv-chip">
+              {{ t('selectionHiddenHint', { count: hiddenSelectedCount }) }}
+            </span>
           </div>
 
           <div v-if="activeTags.length > 0" class="bv-toolbar bv-toolbar--tags">
@@ -1161,15 +1243,6 @@ const activeTags = computed(() => ui.tagFilter);
         @refresh="books.reload()"
       />
 
-      <!-- 分类规则 -->
-      <RuleEditor
-        v-else-if="ui.activeView === 'rules'"
-        :rules="dbStore.rules"
-        :entries="books.entries"
-        :tree="books.tree"
-        @apply="applyClassification"
-      />
-
       <!-- 标签管理 -->
       <TagPanel
         v-else-if="ui.activeView === 'tags'"
@@ -1223,6 +1296,16 @@ const activeTags = computed(() => ui.tagFilter);
       :entries="selectedEntries"
       @close="dialog = null"
       @submit="submitRewrite"
+    />
+
+    <!-- 标题回填：逐条列出前后对比，支持单条 / 勾选 / 全部替换（B2） -->
+    <TitleApplyDialog
+      v-if="dialog === 'titleApply'"
+      :items="titleApplyItems"
+      :failed="titleApplyFailed"
+      :busy="titleApplyBusy"
+      @close="dialog = null"
+      @apply="applyTitleItems"
     />
 
     <!-- 改写结果：跳过项必须逐条列出（A5） -->

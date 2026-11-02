@@ -67,12 +67,11 @@ function managedSubtree(tree: BookmarkTree): BookmarkTree {
   return children;
 }
 
-/** 组装快照内容（D1：书签树 + 规则 + 代理清单 + meta + orphanMeta） */
+/** 组装快照内容（D1：书签树 + 代理清单 + meta + orphanMeta） */
 async function collectSnapshotContent(db: LocalDB): Promise<SnapshotContent> {
   const tree = await getTree();
   return {
     bookmarks: managedSubtree(tree),
-    rules: db.rules,
     proxyBlocklist: db.proxyBlocklist,
     bookmarkMeta: db.bookmarkMeta,
     orphanMeta: db.orphanMeta,
@@ -322,8 +321,8 @@ export async function restoreFromContent(
     try {
       const idMap = await rebuildFromContent(content, parents);
 
-      // 规则与代理清单一并还原
-      await applyPatch({ rules: content.rules, proxyBlocklist: content.proxyBlocklist });
+      // 代理清单一并还原（分类规则已下线，旧快照里的 rules 字段忽略）
+      await applyPatch({ proxyBlocklist: content.proxyBlocklist });
 
       // 按 I1 规则重绑标签备注
       const rebind = await rebindMeta({
@@ -383,7 +382,6 @@ async function rollback(preId: string): Promise<boolean> {
       {
         bookmarkMeta: rebind.bookmarkMeta,
         orphanMeta: rebind.orphanMeta,
-        rules: content.rules,
         proxyBlocklist: content.proxyBlocklist,
         flags: { statsDirty: true },
       },

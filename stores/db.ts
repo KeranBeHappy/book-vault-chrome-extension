@@ -26,7 +26,6 @@ export const useDbStore = defineStore('db', {
   getters: {
     settings: (state): Settings | null => state.db?.settings ?? null,
     ready: (state): boolean => state.db !== null,
-    rules: (state) => state.db?.rules ?? [],
     linkStatus: (state) => state.db?.linkStatus ?? {},
     bookmarkMeta: (state) => state.db?.bookmarkMeta ?? {},
     orphanMeta: (state) => state.db?.orphanMeta ?? {},

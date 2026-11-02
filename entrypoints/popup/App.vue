@@ -14,7 +14,7 @@ import { useFeedbackStore } from '@/stores/feedback';
  * 工具栏 Popup（2.1 / 7 节）。
  *
  * 五个动作都复用既有后台能力，不另起实现：
- * 打开管理页 / 立即备份 / 检测死链 / 开始分类（跳管理页规则视图）/ 收藏当前窗口。
+ * 打开管理页 / 立即备份 / 检测死链 / 收藏当前窗口。
  * 备份状态读 `LocalDB.runtime`，与备份页看到的是同一份数据。
  */
 const feedback = useFeedbackStore();
@@ -96,19 +96,6 @@ function checkLinks(): Promise<void> {
   });
 }
 
-function startClassify(): Promise<void> {
-  return run('classify', async () => {
-    // 分类需要预览 + 手动调整，只能去管理页的规则视图完成（7 节：不另起实现）
-    await sendToBackground({
-      type: 'db:patch',
-      patch: { uiState: { activeView: 'rules' } },
-    });
-    await sendToBackground({ type: 'ui:openManager' });
-    window.close();
-    return null;
-  });
-}
-
 function openCapture(): Promise<void> {
   return run('capture', async () => {
     await sendToBackground({ type: 'ui:openCapture', mode: 'window' });
@@ -142,9 +129,6 @@ onMounted(load);
       </button>
       <button class="bv-btn" type="button" :disabled="busy !== null" @click="checkLinks">
         {{ t('actionCheckLinks') }}
-      </button>
-      <button class="bv-btn" type="button" :disabled="busy !== null" @click="startClassify">
-        {{ t('actionClassify') }}
       </button>
     </div>
 

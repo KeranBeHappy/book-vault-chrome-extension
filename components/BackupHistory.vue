@@ -10,6 +10,7 @@ import {
   type ManagedRoot,
 } from '@/modules/bookmarks';
 import { t, translateError } from '@/modules/i18n';
+import { diffSnapshot, type SnapshotDiff } from '@/modules/snapshot-diff';
 import { sendToBackground, type RestoreOutcome } from '@/shared/messages';
 import type {
   BookmarkNode,
@@ -46,6 +47,9 @@ const recycleBin = computed(() => props.db.recycleBin);
 const opLog = computed(() => props.db.opLog);
 
 const busy = ref(false);
+
+/** 回收站默认收起：条目多时不该一上来就占满整屏 */
+const recycleOpen = ref(false);
 
 function sourceLabel(source: SnapshotMeta['source']): string {
   return t(`snapshotSource_${source}`);
@@ -86,12 +90,40 @@ const previewRows = computed(() => {
   return rows;
 });
 
+/** 快照（操作前）与当前书签的差异，用于预览里的「改动前后对比」 */
+const previewDiff = ref<SnapshotDiff | null>(null);
+
+/** 逐条对比最多显示的条数，超出只给剩余计数 */
+const DIFF_ROW_LIMIT = 20;
+
+const previewHasDiff = computed(() => {
+  const diff = previewDiff.value;
+  if (!diff) return false;
+  return (
+    diff.titleChanges.length > 0 ||
+    diff.urlChanges.length > 0 ||
+    diff.added > 0 ||
+    diff.removed > 0
+  );
+});
+
 async function previewSnapshot(meta: SnapshotMeta): Promise<void> {
   try {
-    previewContent.value = await sendToBackground({ type: 'snapshot:read', id: meta.id });
+    // 并行取快照内容与当前树，避免预览要等两次往返
+    const [content, tree] = await Promise.all([
+      sendToBackground({ type: 'snapshot:read', id: meta.id }),
+      getTree(),
+    ]);
+    previewContent.value = content;
+    previewDiff.value = diffSnapshot(content.bookmarks, tree);
   } catch (err) {
     feedback.error(translateError(err instanceof Error ? err.message : undefined));
   }
+}
+
+function closePreview(): void {
+  previewContent.value = null;
+  previewDiff.value = null;
 }
 
 /** 快照恢复（D4）：先校验并生成 restorePre，再二次确认，再覆盖重建 */
@@ -247,6 +279,11 @@ function cancelPassword(): void {
 
 /** 上传（加密且本机 vault 缺失时会要求输入密码，E2） */
 async function uploadCloud(): Promise<void> {
+  // 未启用 WebDAV 就不要发请求：SW 会直接抛 errWebdavDisabled，控制台会留一条红字
+  if (!props.webdavEnabled) {
+    feedback.error(t('cloudNotConfigured'));
+    return;
+  }
   busy.value = true;
   try {
     let password: string | undefined;
@@ -499,7 +536,6 @@ async function confirmImport(): Promise<void> {
     details: [
       t('importDuplicates', { count: pending.preview.duplicates }),
       t('importInvalid', { count: pending.preview.invalid }),
-      t('importRules', { count: pending.preview.rules }),
       t('importMeta', { count: pending.preview.metaCount }),
       t('importTarget', { target: importTargetName.value }),
     ],
@@ -533,7 +569,13 @@ async function confirmImport(): Promise<void> {
       <button class="bv-btn" type="button" :disabled="busy" @click="manualBackup(false)">
         {{ t('actionBackupLocal') }}
       </button>
-      <button class="bv-btn bv-btn--primary" type="button" :disabled="busy" @click="uploadCloud">
+      <button
+        class="bv-btn bv-btn--primary"
+        type="button"
+        :disabled="busy || !webdavEnabled"
+        :title="webdavEnabled ? '' : t('cloudNotConfigured')"
+        @click="uploadCloud"
+      >
         {{ t('actionBackupCloud') }}
       </button>
     </header>
@@ -562,7 +604,11 @@ async function confirmImport(): Promise<void> {
         <tbody>
           <tr v-for="meta in snapshots" :key="meta.id">
             <td>{{ formatLocalDateTime(meta.createdAt) }}</td>
-            <td>{{ sourceLabel(meta.source) }}</td>
+            <td>
+              {{ sourceLabel(meta.source) }}
+              <!-- note 记录了这次快照对应的操作（如「批量改写」），据此挑要回到哪一步 -->
+              <span v-if="meta.note" class="bv-backup__note">· {{ meta.note }}</span>
+            </td>
             <td>{{ meta.count }}</td>
             <td>{{ formatBytes(meta.bytes) }}</td>
             <td class="bv-backup__actions">
@@ -592,7 +638,18 @@ async function confirmImport(): Promise<void> {
 
     <div class="bv-card">
       <div class="bv-row">
-        <h3 class="bv-section-title" style="margin: 0">{{ t('recycleTitle') }}</h3>
+        <button
+          class="bv-backup__collapse"
+          type="button"
+          :aria-expanded="recycleOpen"
+          :title="t('actionExpand')"
+          @click="recycleOpen = !recycleOpen"
+        >
+          <span class="bv-backup__chevron" :class="{ 'is-open': recycleOpen }" aria-hidden="true">
+            ▸
+          </span>
+          <span class="bv-backup__collapse-label">{{ t('recycleTitle') }}</span>
+        </button>
         <span class="bv-chip">{{ recycleBin.length }}</span>
         <span class="bv-spacer" />
         <button
@@ -605,19 +662,23 @@ async function confirmImport(): Promise<void> {
         </button>
       </div>
       <p class="bv-hint">{{ t('recycleHint') }}</p>
-      <p v-if="recycleBin.length === 0" class="bv-empty">{{ t('recycleEmpty') }}</p>
-      <ul v-else class="bv-backup__list">
-        <li v-for="item in recycleBin" :key="item.id" class="bv-backup__item">
-          <span class="bv-backup__item-title">
-            {{ item.restoredNode.title || item.restoredNode.url }}
-          </span>
-          <span class="bv-hint">{{ formatLocalDateTime(item.deletedAt) }}</span>
-          <span class="bv-spacer" />
-          <button class="bv-btn bv-btn--sm" type="button" @click="restoreItem(item.id)">
-            {{ t('actionRestore') }}
-          </button>
-        </li>
-      </ul>
+      <Transition name="bv-collapse">
+        <div v-if="recycleOpen" class="bv-backup__collapse-body">
+          <p v-if="recycleBin.length === 0" class="bv-empty">{{ t('recycleEmpty') }}</p>
+          <ul v-else class="bv-backup__list">
+            <li v-for="item in recycleBin" :key="item.id" class="bv-backup__item">
+              <span class="bv-backup__item-title">
+                {{ item.restoredNode.title || item.restoredNode.url }}
+              </span>
+              <span class="bv-hint">{{ formatLocalDateTime(item.deletedAt) }}</span>
+              <span class="bv-spacer" />
+              <button class="bv-btn bv-btn--sm" type="button" @click="restoreItem(item.id)">
+                {{ t('actionRestore') }}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </Transition>
     </div>
 
     <div class="bv-card">
@@ -631,6 +692,7 @@ async function confirmImport(): Promise<void> {
           {{ t('actionUndo') }}
         </button>
       </template>
+      <p class="bv-hint">{{ t('undoUseSnapshotHint', { count: db.settings.localSnapshotKeep }) }}</p>
     </div>
 
     <div class="bv-card">
@@ -723,16 +785,79 @@ async function confirmImport(): Promise<void> {
     </div>
 
     <!-- 快照内容预览 -->
-    <div v-if="previewContent" class="bv-mask" @click.self="previewContent = null">
+    <div v-if="previewContent" class="bv-mask" @click.self="closePreview">
       <section class="bv-preview" role="dialog" aria-modal="true">
         <header class="bv-row">
           <h3 class="bv-section-title" style="margin: 0">{{ t('snapshotPreviewTitle') }}</h3>
           <span class="bv-spacer" />
-          <button class="bv-btn bv-btn--sm" type="button" @click="previewContent = null">
+          <button class="bv-btn bv-btn--sm" type="button" @click="closePreview">
             {{ t('actionClose') }}
           </button>
         </header>
         <div class="bv-preview__body bv-scroll">
+          <!-- 改动前后对比：快照是操作前状态，这里列出它与当前书签的差异 -->
+          <section v-if="previewDiff" class="bv-preview__diff">
+            <h4 class="bv-preview__diff-title">{{ t('previewDiffTitle') }}</h4>
+            <p class="bv-hint">{{ t('previewDiffHint') }}</p>
+
+            <p v-if="!previewHasDiff" class="bv-hint">{{ t('previewDiffNoChange') }}</p>
+            <template v-else>
+              <template v-if="previewDiff.titleChanges.length > 0">
+                <p class="bv-hint">
+                  {{ t('previewDiffTitleChanged', { count: previewDiff.titleChanges.length }) }}
+                </p>
+                <ul class="bv-preview__diff-list">
+                  <li
+                    v-for="(change, index) in previewDiff.titleChanges.slice(0, DIFF_ROW_LIMIT)"
+                    :key="`title-${index}`"
+                    class="bv-preview__diff-row"
+                  >
+                    <span class="bv-preview__diff-before" :title="change.before">
+                      {{ change.before || change.url }}
+                    </span>
+                    <span class="bv-preview__diff-arrow" aria-hidden="true">→</span>
+                    <span class="bv-preview__diff-after" :title="change.after">
+                      {{ change.after || change.url }}
+                    </span>
+                  </li>
+                </ul>
+                <p v-if="previewDiff.titleChanges.length > DIFF_ROW_LIMIT" class="bv-hint">
+                  {{ t('previewDiffMore', { count: previewDiff.titleChanges.length - DIFF_ROW_LIMIT }) }}
+                </p>
+              </template>
+
+              <template v-if="previewDiff.urlChanges.length > 0">
+                <p class="bv-hint">
+                  {{ t('previewDiffUrlChanged', { count: previewDiff.urlChanges.length }) }}
+                </p>
+                <ul class="bv-preview__diff-list">
+                  <li
+                    v-for="(change, index) in previewDiff.urlChanges.slice(0, DIFF_ROW_LIMIT)"
+                    :key="`url-${index}`"
+                    class="bv-preview__diff-row"
+                  >
+                    <span class="bv-preview__diff-before" :title="change.before">
+                      {{ change.before }}
+                    </span>
+                    <span class="bv-preview__diff-arrow" aria-hidden="true">→</span>
+                    <span class="bv-preview__diff-after" :title="change.after">
+                      {{ change.after }}
+                    </span>
+                  </li>
+                </ul>
+                <p v-if="previewDiff.urlChanges.length > DIFF_ROW_LIMIT" class="bv-hint">
+                  {{ t('previewDiffMore', { count: previewDiff.urlChanges.length - DIFF_ROW_LIMIT }) }}
+                </p>
+              </template>
+
+              <p class="bv-hint">
+                {{ t('previewDiffAdded', { count: previewDiff.added }) }}
+                ·
+                {{ t('previewDiffRemoved', { count: previewDiff.removed }) }}
+              </p>
+            </template>
+          </section>
+
           <p v-for="row in previewRows" :key="row.id" class="bv-preview__row" :style="{ paddingLeft: `${row.depth * 16}px` }">
             <span v-if="row.url">🔗 {{ row.title || row.url }}</span>
             <span v-else class="bv-preview__folder">📁 {{ row.title || t('unnamedFolder') }}</span>
@@ -806,6 +931,63 @@ async function confirmImport(): Promise<void> {
 .bv-backup__warn {
   color: var(--bv-danger);
   font-size: var(--bv-font-size-sm);
+}
+
+.bv-backup__note {
+  color: var(--bv-text-tertiary);
+}
+
+/* 回收站折叠头：标题整块可点，箭头旋转表示展开态 */
+.bv-backup__collapse {
+  display: inline-flex;
+  gap: var(--bv-space-1);
+  align-items: center;
+  padding: 0;
+  color: var(--bv-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.bv-backup__chevron {
+  display: inline-block;
+  font-size: var(--bv-font-size-xs);
+  line-height: 1;
+  color: var(--bv-text-secondary);
+  transition: transform 160ms ease;
+}
+
+.bv-backup__chevron.is-open {
+  transform: rotate(90deg);
+}
+
+.bv-backup__collapse-label {
+  font-size: var(--bv-font-size-lg);
+  font-weight: 600;
+  transition: color 140ms ease;
+}
+
+.bv-backup__collapse:hover .bv-backup__collapse-label {
+  color: var(--bv-accent);
+}
+
+.bv-backup__collapse-body {
+  overflow: auto;
+  max-height: 320px;
+}
+
+/* 展开/收起：淡入 + 轻微下移，避免高度突变 */
+.bv-collapse-enter-active,
+.bv-collapse-leave-active {
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.bv-collapse-enter-from,
+.bv-collapse-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
 .bv-table {
@@ -904,6 +1086,58 @@ async function confirmImport(): Promise<void> {
 .bv-preview__folder {
   color: var(--bv-text-secondary);
   font-weight: 600;
+}
+
+/* 改动前后对比：与下方的快照树用底色隔开 */
+.bv-preview__diff {
+  padding: var(--bv-space-3);
+  margin-bottom: var(--bv-space-3);
+  background: var(--bv-surface-sunken);
+  border: 1px solid var(--bv-border);
+  border-radius: var(--bv-radius-md);
+}
+
+.bv-preview__diff-title {
+  margin: 0 0 var(--bv-space-1);
+  font-size: var(--bv-font-size-md);
+  font-weight: 600;
+}
+
+.bv-preview__diff-list {
+  padding: 0;
+  margin: var(--bv-space-1) 0;
+  list-style: none;
+}
+
+.bv-preview__diff-row {
+  display: flex;
+  gap: var(--bv-space-2);
+  align-items: center;
+  padding: 3px 0;
+  font-size: var(--bv-font-size-xs);
+}
+
+/* 改前：弱化 + 删除线；改后：加粗，两者都单行省略 */
+.bv-preview__diff-before {
+  overflow: hidden;
+  max-width: 44%;
+  color: var(--bv-text-tertiary);
+  white-space: nowrap;
+  text-decoration: line-through;
+  text-overflow: ellipsis;
+}
+
+.bv-preview__diff-arrow {
+  flex: none;
+  color: var(--bv-text-tertiary);
+}
+
+.bv-preview__diff-after {
+  overflow: hidden;
+  max-width: 44%;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .bv-pwd {

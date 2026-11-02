@@ -16,7 +16,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'toggle', id: string): void;
-  (event: 'toggleAll', ids: string[]): void;
+  // 只上报「当前列表内的 id + 勾/取消」，由父组件增量处理，避免清掉其它筛选下的选择
+  (event: 'toggle-all', payload: { ids: string[]; checked: boolean }): void;
   (event: 'open', node: BookmarkNode): void;
   (event: 'detail', id: string): void;
   (event: 'move', ids: string[]): void;
@@ -54,16 +55,38 @@ const allChecked = computed(
   () => props.items.length > 0 && props.items.every((entry) => props.selected.has(entry.node.id)),
 );
 
+/** 部分选中（半选态）：当前列表有选中但未全选时，全选框显示横杠而不是空框 */
+const partiallyChecked = computed(
+  () => !allChecked.value && props.items.some((entry) => props.selected.has(entry.node.id)),
+);
+
+/** 列表头全选：只上报当前列表内的 id，勾选/取消由父组件增量处理 */
+function onToggleAll(checked: boolean): void {
+  emit('toggle-all', { ids: props.items.map((entry) => entry.node.id), checked });
+}
+
 function onScroll(): void {
   scrollTop.value = container.value?.scrollTop ?? 0;
 }
 
+/**
+ * 垂直滚动条宽度。
+ * 表头在滚动容器之外，右边界比行（受滚动条内缩）宽出一个滚动条，
+ * 不补偿的话「文件夹 / 状态」两列会整体右移，表头与内容对不上。
+ */
+const scrollbarWidth = ref(0);
+
+function measure(): void {
+  const element = container.value;
+  if (!element) return;
+  viewportHeight.value = element.clientHeight;
+  scrollbarWidth.value = Math.max(0, element.offsetWidth - element.clientWidth);
+}
+
 onMounted(() => {
   if (!container.value) return;
-  viewportHeight.value = container.value.clientHeight;
-  observer = new ResizeObserver(() => {
-    viewportHeight.value = container.value?.clientHeight ?? viewportHeight.value;
-  });
+  measure();
+  observer = new ResizeObserver(() => measure());
   observer.observe(container.value);
 });
 
@@ -165,16 +188,19 @@ async function copyLink(node: BookmarkNode): Promise<void> {
 </script>
 
 <template>
-  <div class="bv-list">
+  <div class="bv-list" :style="{ '--bv-list-sb': `${scrollbarWidth}px` }">
     <div class="bv-list__header">
       <label class="bv-list__check">
         <input
           type="checkbox"
           :checked="allChecked"
+          :indeterminate.prop="partiallyChecked"
           :aria-label="t('actionSelectAll')"
-          @change="emit('toggleAll', allChecked ? [] : items.map((item) => item.node.id))"
+          @change="onToggleAll(($event.target as HTMLInputElement).checked)"
         />
       </label>
+      <!-- favicon 列占位：行里有图标，表头必须占同一格，否则后面三列整体左移 -->
+      <span aria-hidden="true" />
       <span class="bv-list__col bv-list__col--title">{{ t('colTitle') }}</span>
       <span class="bv-list__col bv-list__col--folder">{{ t('colFolder') }}</span>
       <span class="bv-list__col bv-list__col--status">{{ t('colStatus') }}</span>
@@ -279,6 +305,9 @@ async function copyLink(node: BookmarkNode): Promise<void> {
 
 <style scoped>
 .bv-list {
+  /* 表头与行共用同一套列宽，避免两处各写一份后漂移 */
+  --bv-list-cols: 28px 16px minmax(0, 1fr) 180px 180px;
+
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -288,10 +317,12 @@ async function copyLink(node: BookmarkNode): Promise<void> {
 
 .bv-list__header {
   display: grid;
-  grid-template-columns: 28px 16px minmax(0, 1fr) 180px 180px;
+  grid-template-columns: var(--bv-list-cols);
   gap: var(--bv-space-2);
   align-items: center;
   padding: 6px var(--bv-space-3);
+  /* 表头不在滚动容器内，右边界比行宽出一个滚动条，按实测宽度补偿 */
+  padding-right: calc(var(--bv-space-3) + var(--bv-list-sb, 0px));
   color: var(--bv-text-secondary);
   font-size: var(--bv-font-size-xs);
   border-bottom: 1px solid var(--bv-border);
@@ -313,7 +344,7 @@ async function copyLink(node: BookmarkNode): Promise<void> {
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: 28px 16px minmax(0, 1fr) 180px 180px;
+  grid-template-columns: var(--bv-list-cols);
   gap: var(--bv-space-2);
   align-items: center;
   height: 40px;

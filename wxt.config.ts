@@ -13,7 +13,7 @@ const ICONS = {
 
 /**
  * 扩展清单的唯一来源。
- * 需求依据：《Chrome书签管理扩展-开发需求文档-V1.2》2.2 节。
+ * 需求依据：《Chrome书签管理扩展-开发需求文档-V1.3》2.2 节。
  * 注意：WXT 不在源码里维护 manifest.json，构建时输出到 `.output/chrome-mv3/manifest.json`。
  */
 export default defineConfig({

@@ -9,7 +9,7 @@
  * - 不能伪造 User-Agent，不能分别走直连/代理对比。
  */
 
-import { HTTP_LIMITS } from '@/shared/constants';
+import { HTTP_LIMITS, UNFETCHABLE_PREFIXES } from '@/shared/constants';
 import { formatLocalDateTime, truncate } from '@/shared/util';
 import type { CsvRow } from '@/shared/types';
 
@@ -19,6 +19,14 @@ import type { CsvRow } from '@/shared/types';
 
 /** 站点后缀：` - 站名`、` | 站名`、`_站名` */
 const SITE_SUFFIX = /\s*[-|_]\s*[^\-|_]{1,40}$/;
+
+/**
+ * 浏览器强制拦截、不允许扩展抓取的站点（Chrome 应用商店等）。
+ * 命中时不要发请求，否则只会得到 CORS 拒绝并污染扩展错误面板。
+ */
+export function isFetchBlocked(url: string): boolean {
+  return UNFETCHABLE_PREFIXES.some((prefix) => url.startsWith(prefix));
+}
 
 /**
  * 标题清洗（B1）：去站点后缀、连续空白与首尾空格；纯本地，不联网。
@@ -178,6 +186,8 @@ function hostOf(url: string): string {
  * 返回 null 表示失败（调用方保留原标题并标记 titleRefresh=failed）。
  */
 export async function fetchSiteName(url: string, timeoutSec: number): Promise<string | null> {
+  // 浏览器强拦的站点不发请求：只会拿到 CORS 错误，控制台还会留红字
+  if (isFetchBlocked(url)) return null;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutSec * 1000);
   try {
@@ -292,6 +302,9 @@ export async function checkLink(
   options?: { proxySuspect?: boolean },
 ): Promise<LinkCheckResult> {
   if (!/^https?:\/\//i.test(url)) return { status: 'unsupported' };
+
+  // 浏览器强拦的站点（webstore 等）不发请求，标为不支持检测
+  if (isFetchBlocked(url)) return { status: 'unsupported', error: 'blockedHost' };
 
   // 命中代理清单：直接标存疑，不发请求（避免 404 被误判死链）
   if (options?.proxySuspect) {

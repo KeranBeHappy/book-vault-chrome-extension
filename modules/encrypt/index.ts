@@ -24,7 +24,6 @@ import type {
   BackupFile,
   BookmarkMeta,
   BookmarkTree,
-  CategoryRule,
   CryptoDescriptor,
   EncryptedKeyVault,
 } from '@/shared/types';
@@ -32,7 +31,6 @@ import type {
 /** 加密载荷的明文结构（加密前整体序列化） */
 export interface PlainBackupPayload {
   bookmarks: BookmarkTree;
-  rules: CategoryRule[];
   proxyBlocklist: string[];
   bookmarkMeta: Record<string, BookmarkMeta>;
   /** 挂起的标签备注；旧备份没有该字段（I1 / D-5） */
@@ -317,7 +315,6 @@ export function assertBackupStructure(file: unknown): asserts file is BackupFile
     if (!candidate.crypto) throw new Error('errBackupCryptoMissing');
     if (
       candidate.bookmarks !== undefined ||
-      candidate.rules !== undefined ||
       candidate.proxyBlocklist !== undefined ||
       candidate.bookmarkMeta !== undefined ||
       candidate.orphanMeta !== undefined
@@ -361,7 +358,6 @@ export async function decryptPayload(file: BackupFile, password?: string): Promi
   if (!file.encrypted) {
     return {
       bookmarks: file.bookmarks ?? [],
-      rules: file.rules ?? [],
       proxyBlocklist: file.proxyBlocklist ?? [],
       bookmarkMeta: file.bookmarkMeta ?? {},
     };
@@ -414,7 +410,6 @@ export async function decryptPayload(file: BackupFile, password?: string): Promi
     const parsed = JSON.parse(decodeUtf8(plain)) as PlainBackupPayload;
     return {
       bookmarks: parsed.bookmarks ?? [],
-      rules: parsed.rules ?? [],
       proxyBlocklist: parsed.proxyBlocklist ?? [],
       bookmarkMeta: parsed.bookmarkMeta ?? {},
     };
@@ -438,7 +433,6 @@ export function buildPlainBackupFile(
     count: countBackupBookmarks(payload.bookmarks),
     encrypted: false,
     bookmarks: payload.bookmarks,
-    rules: payload.rules,
     proxyBlocklist: payload.proxyBlocklist,
     bookmarkMeta: payload.bookmarkMeta,
     orphanMeta: payload.orphanMeta,

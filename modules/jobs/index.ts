@@ -11,7 +11,7 @@
  */
 
 import { getNode, isHttpUrl } from '@/modules/bookmarks';
-import { checkLink, fetchSiteName } from '@/modules/scanner';
+import { checkLink, fetchSiteName, isFetchBlocked } from '@/modules/scanner';
 import {
   ALARMS,
   JOB_BUDGET,
@@ -368,6 +368,14 @@ async function processOne(
 
   // titleRefresh：只抓取，不写书签（回填需用户二次确认，B2）
   if (!node.url || !isHttpUrl(node.url)) return { ok: false };
+  // 浏览器强拦的站点（webstore 等）：不发请求、不算失败，标题保持原值
+  if (isFetchBlocked(node.url)) {
+    statusDelta[id] = {
+      ...(existing[id] ?? { status: 'untested' as const }),
+      titleRefresh: 'unchanged',
+    };
+    return { ok: true };
+  }
   const title = await fetchSiteName(node.url, timeoutSec);
   if (!title) {
     statusDelta[id] = {

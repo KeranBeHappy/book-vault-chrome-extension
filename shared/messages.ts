@@ -94,8 +94,8 @@ export type BvRequest =
   | { type: 'job:cancel'; jobId: string }
   | { type: 'job:progress'; jobId: string }
   | { type: 'job:results'; jobId: string }
-  | { type: 'title:apply'; jobId: string; snapshotId: string }
-  | { type: 'classify:apply'; items: Array<{ bookmarkId: string; category: string }>; snapshotId: string }
+  // ids 省略表示应用全部；弹窗里单条 / 勾选替换时只传对应 id
+  | { type: 'title:apply'; jobId: string; snapshotId: string; ids?: string[] }
   | { type: 'webdav:test'; config: WebDavSettings }
   | { type: 'webdav:list' }
   | { type: 'webdav:upload'; password?: string }
@@ -141,8 +141,7 @@ export interface BvResponseMap {
   'job:cancel': JobProgress;
   'job:progress': JobProgress;
   'job:results': Record<string, string>;
-  'title:apply': { updated: number; failed: number };
-  'classify:apply': { moved: number; invalid: number; removedFolders: number };
+  'title:apply': { updated: number; failed: number; appliedIds: string[] };
   'webdav:test': WebDavTestResult;
   'webdav:list': RemoteBackupEntry[];
   'webdav:upload': { fileName: string; deleted: number };
@@ -151,7 +150,7 @@ export interface BvResponseMap {
   'webdav:delete': null;
   'backup:now': { snapshot: SnapshotMeta; uploaded: boolean; fileName?: string; error?: string };
   'io:parse': ImportPreview;
-  'io:import': { created: number; duplicates: number; invalid: number; rules: number; boundMeta: number; orphanMeta: number };
+  'io:import': { created: number; duplicates: number; invalid: number; boundMeta: number; orphanMeta: number };
   'io:exportJson': { fileName: string; content: string };
   'io:exportHtml': { fileName: string; content: string };
   'encrypt:setup': null;

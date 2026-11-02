@@ -13,9 +13,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "actionApply": {
       "message": "应用"
     },
-    "actionApplyClassify": {
-      "message": "应用分类"
-    },
     "actionBackupCloud": {
       "message": "备份到云端"
     },
@@ -33,9 +30,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "actionCheckLinks": {
       "message": "死链检测"
-    },
-    "actionClassify": {
-      "message": "规则分类"
     },
     "actionClearFilter": {
       "message": "清除筛选"
@@ -91,9 +85,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "actionExportJson": {
       "message": "导出 JSON"
     },
-    "actionExportRules": {
-      "message": "导出规则"
-    },
     "actionGeneratePreview": {
       "message": "生成预览"
     },
@@ -109,9 +100,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "actionImportJson": {
       "message": "导入 JSON"
     },
-    "actionImportRules": {
-      "message": "导入规则"
-    },
     "actionMerge": {
       "message": "合并"
     },
@@ -123,9 +111,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "actionNewFolder": {
       "message": "新建文件夹"
-    },
-    "actionNewRule": {
-      "message": "新建规则"
     },
     "actionOpen": {
       "message": "打开"
@@ -265,33 +250,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "captureTitle": {
       "message": "收藏当前窗口标签",
       "description": "收藏小窗标题"
-    },
-    "classifyApplied": {
-      "message": "已移动 $moved 条，失败 $invalid 条"
-    },
-    "classifyApplyMessage": {
-      "message": "将按规则移动 $count 条书签"
-    },
-    "classifyApplyTitle": {
-      "message": "应用分类结果"
-    },
-    "classifyDiscardHint": {
-      "message": "分类后变空的原有文件夹会被删除"
-    },
-    "classifyImpact": {
-      "message": "预览：$total 条书签，将删除 $folders 个空文件夹"
-    },
-    "classifyManual": {
-      "message": "手动调整"
-    },
-    "classifyPreviewHint": {
-      "message": "预览结果可在下方手动调整，仅对本次生效"
-    },
-    "classifyPreviewTitle": {
-      "message": "分类预览"
-    },
-    "classifyRemovedFolders": {
-      "message": "将删除 $count 个已空的文件夹"
     },
     "clearVaultDetail": {
       "message": "云端备份文件不受影响，只是本机不再记住密码。"
@@ -600,15 +558,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "errRootProtected": {
       "message": "浏览器内置根目录不支持修改"
     },
-    "errRuleCategoryEmpty": {
-      "message": "目标分类不能为空"
-    },
-    "errRuleImportInvalid": {
-      "message": "规则文件格式不正确"
-    },
-    "errRulePatternEmpty": {
-      "message": "匹配式不能为空"
-    },
     "errSchemaTooNew": {
       "message": "数据版本高于当前扩展版本，已进入只读模式，请更新扩展"
     },
@@ -716,15 +665,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "fieldRememberKey": {
       "message": "在本机记住密钥"
     },
-    "fieldRuleCategory": {
-      "message": "目标分类"
-    },
-    "fieldRulePattern": {
-      "message": "匹配式"
-    },
-    "fieldRuleType": {
-      "message": "规则类型"
-    },
     "fieldSimilarity": {
       "message": "标题相似度阈值"
     },
@@ -821,9 +761,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "importPasswordTitle": {
       "message": "输入备份密码"
     },
-    "importRules": {
-      "message": "将导入 $count 条分类规则"
-    },
     "importTarget": {
       "message": "导入到「$target」"
     },
@@ -904,9 +841,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "noFolders": {
       "message": "暂无文件夹"
     },
-    "noRuleMatched": {
-      "message": "未命中任何规则"
-    },
     "noSnapshots": {
       "message": "暂无本地快照"
     },
@@ -921,9 +855,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "opAction_capture": {
       "message": "收藏"
-    },
-    "opAction_classify": {
-      "message": "分类"
     },
     "opAction_delete": {
       "message": "删除"
@@ -1013,6 +944,30 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "popupTitle": {
       "message": "签仓",
       "description": "Popup 标题"
+    },
+    "previewDiffAdded": {
+      "message": "新增 $count 条"
+    },
+    "previewDiffHint": {
+      "message": "快照是操作前的状态，下面的差异同时包含该次操作以及之后的其它改动"
+    },
+    "previewDiffMore": {
+      "message": "还有 $count 条未显示"
+    },
+    "previewDiffNoChange": {
+      "message": "与当前书签一致"
+    },
+    "previewDiffRemoved": {
+      "message": "删除 $count 条"
+    },
+    "previewDiffTitle": {
+      "message": "与当前书签对比"
+    },
+    "previewDiffTitleChanged": {
+      "message": "标题变化 $count 条"
+    },
+    "previewDiffUrlChanged": {
+      "message": "链接变化 $count 条"
     },
     "proxyHint": {
       "message": "以下域名判定失败时会被标记为「疑似需代理」"
@@ -1137,44 +1092,14 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "rewriteUrlOnlyReplace": {
       "message": "链接只支持查找替换，结果必须通过 http/https 校验"
     },
-    "ruleCategoryPlaceholder": {
-      "message": "例如：开发工具"
-    },
-    "ruleImportDone": {
-      "message": "已导入 $count 条规则"
-    },
-    "rulePatternPlaceholder": {
-      "message": "例如：github.com 或 教程"
-    },
-    "ruleTypeDomainContains": {
-      "message": "域名包含"
-    },
-    "ruleTypeDomainExact": {
-      "message": "域名精确匹配"
-    },
-    "ruleTypeTitleKeyword": {
-      "message": "标题关键词"
-    },
-    "ruleTypeUrlKeyword": {
-      "message": "链接关键词"
-    },
-    "rulesDragHint": {
-      "message": "拖动可调整同类型规则的优先级"
-    },
-    "rulesGroupEmpty": {
-      "message": "该类型下暂无规则"
-    },
-    "rulesPriorityHint": {
-      "message": "类型之间优先级固定，拖动只能在同类型内调整"
-    },
-    "rulesTitle": {
-      "message": "分类规则"
-    },
     "searchPlaceholder": {
       "message": "搜索标题、链接、标签或备注"
     },
     "selectedCount": {
       "message": "已选 $count 项"
+    },
+    "selectionHiddenHint": {
+      "message": "另有 $count 条已选中但不在当前筛选内，本次不处理"
     },
     "settingsEncryption": {
       "message": "加密"
@@ -1323,17 +1248,41 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "titleApplied": {
       "message": "已回填 $updated 条标题，失败 $failed 条"
     },
-    "titleApplyDetail": {
-      "message": "修改会记入撤销日志，可撤销一次"
+    "titleApplyAllItems": {
+      "message": "全部替换"
     },
-    "titleApplyMessage": {
-      "message": "将修改 $count 条书签的标题"
+    "titleApplyColAfter": {
+      "message": "新标题"
+    },
+    "titleApplyColBefore": {
+      "message": "原标题"
+    },
+    "titleApplyDetail": {
+      "message": "修改会记入撤销日志，可逐次撤销"
+    },
+    "titleApplyFailedHint": {
+      "message": "另有 $count 条抓取失败，未列出"
+    },
+    "titleApplyPickHint": {
+      "message": "勾选要替换的条目，也可以只替换某一条"
+    },
+    "titleApplySelected": {
+      "message": "替换选中 $count 条"
+    },
+    "titleApplySingle": {
+      "message": "替换"
     },
     "titleApplyTitle": {
       "message": "回填标题"
     },
-    "titleRefreshNoChange": {
-      "message": "标题没有变化"
+    "titleRefreshDoneNoChange": {
+      "message": "刷新标题完成：标题没有变化"
+    },
+    "titleRefreshDoneNoChangeFailed": {
+      "message": "刷新标题完成：标题没有变化（$failed 条抓取失败）"
+    },
+    "titleRefreshFailed": {
+      "message": "标题刷新失败 $count 条"
     },
     "undoEmpty": {
       "message": "暂无可撤销的操作"
@@ -1349,6 +1298,9 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "undoTitle": {
       "message": "撤销"
+    },
+    "undoUseSnapshotHint": {
+      "message": "需要回退更多步时，可在上方本地快照里恢复到任意一次变更前（当前保留 $count 条）"
     },
     "unnamedFolder": {
       "message": "未命名文件夹"
@@ -1367,9 +1319,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "view_manager": {
       "message": "书签管理"
-    },
-    "view_rules": {
-      "message": "规则"
     },
     "view_settings": {
       "message": "设置"
@@ -1391,9 +1340,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "actionApply": {
       "message": "Apply"
     },
-    "actionApplyClassify": {
-      "message": "Apply categories"
-    },
     "actionBackupCloud": {
       "message": "Back up to cloud"
     },
@@ -1411,9 +1357,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "actionCheckLinks": {
       "message": "Check dead links"
-    },
-    "actionClassify": {
-      "message": "Sort by rules"
     },
     "actionClearFilter": {
       "message": "Clear filter"
@@ -1469,9 +1412,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "actionExportJson": {
       "message": "Export JSON"
     },
-    "actionExportRules": {
-      "message": "Export rules"
-    },
     "actionGeneratePreview": {
       "message": "Generate preview"
     },
@@ -1487,9 +1427,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "actionImportJson": {
       "message": "Import JSON"
     },
-    "actionImportRules": {
-      "message": "Import rules"
-    },
     "actionMerge": {
       "message": "Merge"
     },
@@ -1501,9 +1438,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "actionNewFolder": {
       "message": "New folder"
-    },
-    "actionNewRule": {
-      "message": "New rule"
     },
     "actionOpen": {
       "message": "Open"
@@ -1643,33 +1577,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "captureTitle": {
       "message": "Save current window tabs",
       "description": "Capture window title"
-    },
-    "classifyApplied": {
-      "message": "Moved $moved, failed $invalid"
-    },
-    "classifyApplyMessage": {
-      "message": "$count bookmark(s) will be moved by the rules"
-    },
-    "classifyApplyTitle": {
-      "message": "Apply classification"
-    },
-    "classifyDiscardHint": {
-      "message": "Original folders that become empty will be deleted"
-    },
-    "classifyImpact": {
-      "message": "Preview: $total bookmark(s), $folders empty folder(s) will be removed"
-    },
-    "classifyManual": {
-      "message": "Adjust manually"
-    },
-    "classifyPreviewHint": {
-      "message": "You can adjust the preview below; changes apply to this run only"
-    },
-    "classifyPreviewTitle": {
-      "message": "Classification preview"
-    },
-    "classifyRemovedFolders": {
-      "message": "$count empty folder(s) will be removed"
     },
     "clearVaultDetail": {
       "message": "Cloud backup files are untouched; only the local copy of the key is removed."
@@ -1978,15 +1885,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "errRootProtected": {
       "message": "Built-in browser roots cannot be modified"
     },
-    "errRuleCategoryEmpty": {
-      "message": "Category cannot be empty"
-    },
-    "errRuleImportInvalid": {
-      "message": "Invalid rules file format"
-    },
-    "errRulePatternEmpty": {
-      "message": "Pattern cannot be empty"
-    },
     "errSchemaTooNew": {
       "message": "Data was written by a newer version; running read-only. Please update the extension."
     },
@@ -2094,15 +1992,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "fieldRememberKey": {
       "message": "Remember key on this device"
     },
-    "fieldRuleCategory": {
-      "message": "Category"
-    },
-    "fieldRulePattern": {
-      "message": "Pattern"
-    },
-    "fieldRuleType": {
-      "message": "Rule type"
-    },
     "fieldSimilarity": {
       "message": "Title similarity threshold"
     },
@@ -2199,9 +2088,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "importPasswordTitle": {
       "message": "Enter backup password"
     },
-    "importRules": {
-      "message": "$count rule(s) will be imported"
-    },
     "importTarget": {
       "message": "Import into \"$target\""
     },
@@ -2282,9 +2168,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "noFolders": {
       "message": "No folders"
     },
-    "noRuleMatched": {
-      "message": "No rule matched"
-    },
     "noSnapshots": {
       "message": "No local snapshots"
     },
@@ -2299,9 +2182,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "opAction_capture": {
       "message": "Capture"
-    },
-    "opAction_classify": {
-      "message": "Classify"
     },
     "opAction_delete": {
       "message": "Delete"
@@ -2391,6 +2271,30 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "popupTitle": {
       "message": "BookVault",
       "description": "Popup title"
+    },
+    "previewDiffAdded": {
+      "message": "$count added"
+    },
+    "previewDiffHint": {
+      "message": "The snapshot is the state before that operation; the differences below also include later changes"
+    },
+    "previewDiffMore": {
+      "message": "$count more not shown"
+    },
+    "previewDiffNoChange": {
+      "message": "No difference from current bookmarks"
+    },
+    "previewDiffRemoved": {
+      "message": "$count removed"
+    },
+    "previewDiffTitle": {
+      "message": "Compared with current bookmarks"
+    },
+    "previewDiffTitleChanged": {
+      "message": "$count title(s) changed"
+    },
+    "previewDiffUrlChanged": {
+      "message": "$count URL(s) changed"
     },
     "proxyHint": {
       "message": "These domains are marked as \"proxy suspected\" when checks fail"
@@ -2515,44 +2419,14 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "rewriteUrlOnlyReplace": {
       "message": "URLs only support find and replace; the result must pass http/https validation"
     },
-    "ruleCategoryPlaceholder": {
-      "message": "e.g. Dev tools"
-    },
-    "ruleImportDone": {
-      "message": "Imported $count rule(s)"
-    },
-    "rulePatternPlaceholder": {
-      "message": "e.g. github.com or tutorial"
-    },
-    "ruleTypeDomainContains": {
-      "message": "Domain contains"
-    },
-    "ruleTypeDomainExact": {
-      "message": "Exact domain"
-    },
-    "ruleTypeTitleKeyword": {
-      "message": "Title keyword"
-    },
-    "ruleTypeUrlKeyword": {
-      "message": "URL keyword"
-    },
-    "rulesDragHint": {
-      "message": "Drag to reorder rules of the same type"
-    },
-    "rulesGroupEmpty": {
-      "message": "No rules of this type yet"
-    },
-    "rulesPriorityHint": {
-      "message": "Priority between types is fixed; dragging only reorders within a type"
-    },
-    "rulesTitle": {
-      "message": "Classification rules"
-    },
     "searchPlaceholder": {
       "message": "Search titles, links, tags or notes"
     },
     "selectedCount": {
       "message": "$count selected"
+    },
+    "selectionHiddenHint": {
+      "message": "$count selected bookmark(s) are outside the current filter and will not be touched"
     },
     "settingsEncryption": {
       "message": "Encryption"
@@ -2701,17 +2575,41 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     "titleApplied": {
       "message": "Updated $updated title(s), $failed failed"
     },
-    "titleApplyDetail": {
-      "message": "Changes are recorded in the undo log and can be undone once"
+    "titleApplyAllItems": {
+      "message": "Replace all"
     },
-    "titleApplyMessage": {
-      "message": "$count bookmark title(s) will change"
+    "titleApplyColAfter": {
+      "message": "New title"
+    },
+    "titleApplyColBefore": {
+      "message": "Current title"
+    },
+    "titleApplyDetail": {
+      "message": "Changes are recorded in the undo log and can be undone step by step"
+    },
+    "titleApplyFailedHint": {
+      "message": "$count more failed to fetch and are not listed"
+    },
+    "titleApplyPickHint": {
+      "message": "Tick the entries to replace, or replace a single one"
+    },
+    "titleApplySelected": {
+      "message": "Replace $count selected"
+    },
+    "titleApplySingle": {
+      "message": "Replace"
     },
     "titleApplyTitle": {
       "message": "Apply new titles"
     },
-    "titleRefreshNoChange": {
-      "message": "Titles are unchanged"
+    "titleRefreshDoneNoChange": {
+      "message": "Title refresh finished: no title changed"
+    },
+    "titleRefreshDoneNoChangeFailed": {
+      "message": "Title refresh finished: no title changed ($failed failed)"
+    },
+    "titleRefreshFailed": {
+      "message": "Title refresh failed for $count bookmark(s)"
     },
     "undoEmpty": {
       "message": "Nothing to undo"
@@ -2727,6 +2625,9 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "undoTitle": {
       "message": "Undo"
+    },
+    "undoUseSnapshotHint": {
+      "message": "To step back further, restore a local snapshot above (keeps $count)"
     },
     "unnamedFolder": {
       "message": "Untitled folder"
@@ -2745,9 +2646,6 @@ export const MESSAGES: Record<'zh_CN' | 'en', Record<string, MessageEntry>> = {
     },
     "view_manager": {
       "message": "Bookmarks"
-    },
-    "view_rules": {
-      "message": "Rules"
     },
     "view_settings": {
       "message": "Settings"

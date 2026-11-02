@@ -109,9 +109,6 @@
   "view_stats": {
     "message": "统计"
   },
-  "view_rules": {
-    "message": "规则"
-  },
   "view_tags": {
     "message": "标签"
   },
@@ -129,9 +126,6 @@
   },
   "opAction_rename": {
     "message": "重命名"
-  },
-  "opAction_classify": {
-    "message": "分类"
   },
   "opAction_rewrite": {
     "message": "改写链接"
@@ -166,9 +160,6 @@
   "actionApply": {
     "message": "应用"
   },
-  "actionApplyClassify": {
-    "message": "应用分类"
-  },
   "actionBackupCloud": {
     "message": "备份到云端"
   },
@@ -186,9 +177,6 @@
   },
   "actionCheckLinks": {
     "message": "死链检测"
-  },
-  "actionClassify": {
-    "message": "规则分类"
   },
   "actionClearFilter": {
     "message": "清除筛选"
@@ -244,9 +232,6 @@
   "actionExportJson": {
     "message": "导出 JSON"
   },
-  "actionExportRules": {
-    "message": "导出规则"
-  },
   "actionGeneratePreview": {
     "message": "生成预览"
   },
@@ -262,9 +247,6 @@
   "actionImportJson": {
     "message": "导入 JSON"
   },
-  "actionImportRules": {
-    "message": "导入规则"
-  },
   "actionMerge": {
     "message": "合并"
   },
@@ -276,9 +258,6 @@
   },
   "actionNewFolder": {
     "message": "新建文件夹"
-  },
-  "actionNewRule": {
-    "message": "新建规则"
   },
   "actionOpen": {
     "message": "打开"
@@ -354,33 +333,6 @@
   },
   "bookmarkDeleted": {
     "message": "已删除 $count 条书签"
-  },
-  "classifyApplyTitle": {
-    "message": "应用分类结果"
-  },
-  "classifyApplyMessage": {
-    "message": "将按规则移动 $count 条书签"
-  },
-  "classifyApplied": {
-    "message": "已移动 $moved 条，失败 $invalid 条"
-  },
-  "classifyDiscardHint": {
-    "message": "分类后变空的原有文件夹会被删除"
-  },
-  "classifyImpact": {
-    "message": "预览：$total 条书签，将删除 $folders 个空文件夹"
-  },
-  "classifyManual": {
-    "message": "手动调整"
-  },
-  "classifyPreviewHint": {
-    "message": "预览结果可在下方手动调整，仅对本次生效"
-  },
-  "classifyPreviewTitle": {
-    "message": "分类预览"
-  },
-  "classifyRemovedFolders": {
-    "message": "将删除 $count 个已空的文件夹"
   },
   "clearVaultTitle": {
     "message": "清除本机密钥"
@@ -736,15 +688,6 @@
   "errBackupCorrupted": {
     "message": "备份文件内容已损坏，无法解析"
   },
-  "errRulePatternEmpty": {
-    "message": "匹配式不能为空"
-  },
-  "errRuleCategoryEmpty": {
-    "message": "目标分类不能为空"
-  },
-  "errRuleImportInvalid": {
-    "message": "规则文件格式不正确"
-  },
   "errNoHttpBookmarks": {
     "message": "当前范围内没有可检测的 http(s) 书签"
   },
@@ -820,15 +763,6 @@
   "fieldNewPassword": {
     "message": "新密码"
   },
-  "fieldRuleType": {
-    "message": "规则类型"
-  },
-  "fieldRulePattern": {
-    "message": "匹配式"
-  },
-  "fieldRuleCategory": {
-    "message": "目标分类"
-  },
   "fieldEnabled": {
     "message": "启用该规则"
   },
@@ -882,9 +816,6 @@
   },
   "importInvalid": {
     "message": "非法 $count 条将跳过"
-  },
-  "importRules": {
-    "message": "将导入 $count 条分类规则"
   },
   "importMeta": {
     "message": "将恢复 $count 条标签与备注"
@@ -990,9 +921,6 @@
   },
   "noFolders": {
     "message": "暂无文件夹"
-  },
-  "noRuleMatched": {
-    "message": "未命中任何规则"
   },
   "noSnapshots": {
     "message": "暂无本地快照"
@@ -1165,41 +1093,11 @@
   "restoreFailedNoRollback": {
     "message": "恢复失败且回滚失败，请用快照 $id 手动恢复"
   },
-  "ruleCategoryPlaceholder": {
-    "message": "例如：开发工具"
-  },
-  "ruleImportDone": {
-    "message": "已导入 $count 条规则"
-  },
-  "rulePatternPlaceholder": {
-    "message": "例如：github.com 或 教程"
-  },
-  "rulesTitle": {
-    "message": "分类规则"
-  },
-  "rulesDragHint": {
-    "message": "拖动可调整同类型规则的优先级"
-  },
-  "rulesGroupEmpty": {
-    "message": "该类型下暂无规则"
-  },
-  "rulesPriorityHint": {
-    "message": "类型之间优先级固定，拖动只能在同类型内调整"
-  },
-  "ruleTypeDomainExact": {
-    "message": "域名精确匹配"
-  },
-  "ruleTypeDomainContains": {
-    "message": "域名包含"
-  },
-  "ruleTypeUrlKeyword": {
-    "message": "链接关键词"
-  },
-  "ruleTypeTitleKeyword": {
-    "message": "标题关键词"
-  },
   "searchPlaceholder": {
     "message": "搜索标题、链接、标签或备注"
+  },
+  "selectionHiddenHint": {
+    "message": "另有 $count 条已选中但不在当前筛选内，本次不处理"
   },
   "selectedCount": {
     "message": "已选 $count 项"
@@ -1230,6 +1128,30 @@
   },
   "snapshotDeleted": {
     "message": "快照已删除"
+  },
+  "previewDiffTitle": {
+    "message": "与当前书签对比"
+  },
+  "previewDiffHint": {
+    "message": "快照是操作前的状态，下面的差异同时包含该次操作以及之后的其它改动"
+  },
+  "previewDiffNoChange": {
+    "message": "与当前书签一致"
+  },
+  "previewDiffTitleChanged": {
+    "message": "标题变化 $count 条"
+  },
+  "previewDiffUrlChanged": {
+    "message": "链接变化 $count 条"
+  },
+  "previewDiffAdded": {
+    "message": "新增 $count 条"
+  },
+  "previewDiffRemoved": {
+    "message": "删除 $count 条"
+  },
+  "previewDiffMore": {
+    "message": "还有 $count 条未显示"
   },
   "snapshotPreviewTitle": {
     "message": "快照内容"
@@ -1336,20 +1258,47 @@
   "titleApplyTitle": {
     "message": "回填标题"
   },
-  "titleApplyMessage": {
-    "message": "将修改 $count 条书签的标题"
+  "titleApplyPickHint": {
+    "message": "勾选要替换的条目，也可以只替换某一条"
+  },
+  "titleApplyColBefore": {
+    "message": "原标题"
+  },
+  "titleApplyColAfter": {
+    "message": "新标题"
+  },
+  "titleApplySingle": {
+    "message": "替换"
+  },
+  "titleApplySelected": {
+    "message": "替换选中 $count 条"
+  },
+  "titleApplyAllItems": {
+    "message": "全部替换"
+  },
+  "titleApplyFailedHint": {
+    "message": "另有 $count 条抓取失败，未列出"
   },
   "titleApplyDetail": {
-    "message": "修改会记入撤销日志，可撤销一次"
+    "message": "修改会记入撤销日志，可逐次撤销"
   },
   "titleApplied": {
     "message": "已回填 $updated 条标题，失败 $failed 条"
   },
-  "titleRefreshNoChange": {
-    "message": "标题没有变化"
+  "titleRefreshDoneNoChange": {
+    "message": "刷新标题完成：标题没有变化"
+  },
+  "titleRefreshDoneNoChangeFailed": {
+    "message": "刷新标题完成：标题没有变化（$failed 条抓取失败）"
+  },
+  "titleRefreshFailed": {
+    "message": "标题刷新失败 $count 条"
   },
   "undoTitle": {
     "message": "撤销"
+  },
+  "undoUseSnapshotHint": {
+    "message": "需要回退更多步时，可在上方本地快照里恢复到任意一次变更前（当前保留 $count 条）"
   },
   "undoMessage": {
     "message": "确认撤销「$action」？"

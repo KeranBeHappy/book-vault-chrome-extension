@@ -325,7 +325,7 @@ function onDragEnd(): void {
   font-weight: 600;
 }
 
-/* 拖拽落点提示：虚线边框比整块高亮更轻，符合千苍主题的克制基调 */
+/* 拖拽落点提示：虚线边框比整块高亮更轻，符合整体的克制基调 */
 .bv-tree__row.is-drop {
   outline: 1px dashed var(--bv-primary);
   outline-offset: -1px;

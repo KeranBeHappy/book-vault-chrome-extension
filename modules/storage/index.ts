@@ -12,7 +12,6 @@
  */
 
 import {
-  DEFAULT_RULES,
   DEFAULT_SETTINGS,
   SHARDED_SECTIONS,
   STORAGE_KEYS,
@@ -21,7 +20,6 @@ import {
 import { withWriteLock } from '@/shared/lock';
 import type { DeepPartial } from '@/shared/messages';
 import type {
-  CategoryRule,
   EncryptedKeyVault,
   Flags,
   JobState,
@@ -36,13 +34,12 @@ import type {
 } from '@/shared/types';
 
 /** 当前扩展支持的 schema 版本；升级必须 +1 并补迁移函数（4.7） */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /** 字段 → storage 键 */
 const SECTION_KEYS: Record<keyof LocalDB, string> = {
   schemaVersion: STORAGE_KEYS.schemaVersion,
   settings: STORAGE_KEYS.settings,
-  rules: STORAGE_KEYS.rules,
   proxyBlocklist: STORAGE_KEYS.proxyBlocklist,
   linkStatus: STORAGE_KEYS.linkStatus,
   bookmarkMeta: STORAGE_KEYS.bookmarkMeta,
@@ -73,7 +70,6 @@ export function createEmptyDb(): LocalDB {
   return {
     schemaVersion: SCHEMA_VERSION,
     settings: structuredClone(DEFAULT_SETTINGS),
-    rules: DEFAULT_RULES.map((rule) => ({ ...rule })),
     proxyBlocklist: [],
     linkStatus: {},
     bookmarkMeta: {},
@@ -242,7 +238,6 @@ export async function readDb(): Promise<LocalDB> {
   return {
     schemaVersion: version,
     settings: mergeSettings(base.settings, (raw[STORAGE_KEYS.settings] as Partial<Settings>) ?? {}),
-    rules: (raw[STORAGE_KEYS.rules] as CategoryRule[]) ?? base.rules,
     proxyBlocklist: (raw[STORAGE_KEYS.proxyBlocklist] as string[]) ?? [],
     linkStatus,
     bookmarkMeta,
@@ -435,7 +430,15 @@ export async function needsMigration(): Promise<boolean> {
 
 /** 迁移函数表：key 为「迁移到的目标版本」，逐级执行（4.7） */
 const MIGRATIONS: Record<number, (db: LocalDB) => Promise<LocalDB> | LocalDB> = {
-  // 当前只有 v1，占位示例：2: async (db) => { ...; return db; }
+  /**
+   * v1 → v2：移除「书签自动分类」功能，删掉遗留的 rules 键。
+   * 分类会把书签按规则批量移动并丢弃原层级，功能已整体下线，
+   * 这里顺手把旧数据清掉，避免留下永远读不到的孤立键。
+   */
+  2: async (db) => {
+    await removeItems(['rules']);
+    return db;
+  },
 };
 
 /**

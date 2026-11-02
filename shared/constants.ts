@@ -1,11 +1,11 @@
 /**
  * 全局常量与默认值。
  *
- * 依据：《Chrome书签管理扩展-开发需求文档-V1.1》第 10 节「默认参数表」与 3.4 内置分类。
+ * 依据：《Chrome书签管理扩展-开发需求文档》第 10 节「默认参数表」。
  * 原则：所有「魔法值」集中在此，业务代码不得内联字面量。
  */
 
-import type { CategoryRule, Settings } from './types';
+import type { Settings } from './types';
 
 /**
  * storage.local 的键名约定。
@@ -17,7 +17,6 @@ import type { CategoryRule, Settings } from './types';
 export const STORAGE_KEYS = {
   schemaVersion: 'schemaVersion',
   settings: 'settings',
-  rules: 'rules',
   proxyBlocklist: 'proxyBlocklist',
   linkStatus: 'linkStatus',
   bookmarkMeta: 'bookmarkMeta',
@@ -125,6 +124,15 @@ export const STATUS_FLUSH = {
 /** 任务 id 列表超过该数量时改为分片存储（3.2 JobState.targetRef） */
 export const JOB_TARGET_INLINE_LIMIT = 5000;
 
+/**
+ * 浏览器强制禁止扩展抓取的站点（即使有 `<all_urls>` 权限）。
+ * 对它们发请求只会得到 CORS 拒绝，并在扩展「错误」面板留下红字，所以直接跳过。
+ */
+export const UNFETCHABLE_PREFIXES = [
+  'https://chromewebstore.google.com',
+  'https://chrome.google.com/webstore',
+] as const;
+
 /** 检测/抓取请求上限 */
 export const HTTP_LIMITS = {
   /** 标题抓取最多读 256KB 后中止 */
@@ -168,51 +176,6 @@ export const CRYPTO = {
   ivBytes: 12,
   aad: 'bookvault-backup-v1',
 } as const;
-
-/** 内置默认分类（一级平铺） */
-export const DEFAULT_CATEGORIES = [
-  '视频',
-  '社交',
-  '购物',
-  '工具',
-  '资讯',
-  '开发',
-  '金融',
-  '学习',
-  '娱乐',
-  '待分类',
-] as const;
-
-/** 「待分类」桶名：无规则命中时归入 */
-export const UNCATEGORIZED = '待分类';
-
-/**
- * 内置示例规则（3.4「每类附带常见域名示例规则」）。
- * 用 domainContains + order 递增，用户可在界面增删改。
- */
-const RULE_SEEDS: Array<[string, string[]]> = [
-  ['视频', ['bilibili.com', 'youtube.com', 'youku.com', 'iqiyi.com', 'v.qq.com', 'vimeo.com']],
-  ['社交', ['weibo.com', 'x.com', 'twitter.com', 'facebook.com', 'instagram.com', 'douban.com']],
-  ['购物', ['taobao.com', 'tmall.com', 'jd.com', 'amazon.com', 'pinduoduo.com']],
-  ['工具', ['notion.so', 'figma.com', 'trello.com', 'docs.google.com', 'feishu.cn']],
-  ['资讯', ['36kr.com', 'sspai.com', 'thepaper.cn', 'news.ycombinator.com']],
-  ['开发', ['github.com', 'gitlab.com', 'stackoverflow.com', 'developer.mozilla.org', 'npmjs.com']],
-  ['金融', ['eastmoney.com', 'xueqiu.com', 'coinmarketcap.com', 'alipay.com']],
-  ['学习', ['coursera.org', 'udemy.com', 'khanacademy.org', 'jianshu.com']],
-  ['娱乐', ['netflix.com', 'spotify.com', 'steampowered.com', 'bilibili.com/live']],
-];
-
-/** 生成内置规则：id 固定为 `default-<category>-<i>`，便于去重与迁移 */
-export const DEFAULT_RULES: CategoryRule[] = RULE_SEEDS.flatMap(([category, patterns]) =>
-  patterns.map((pattern, index) => ({
-    id: `default-${category}-${index + 1}`,
-    type: 'domainContains' as const,
-    pattern,
-    category,
-    enabled: true,
-    order: index + 1,
-  })),
-);
 
 /** 受管根：书签栏 / 其他书签；「移动设备书签」隐藏且不可操作 */
 export const MANAGED_ROOT_IDS = ['1', '2'] as const;

@@ -26,7 +26,6 @@ import { withWriteLock } from '@/shared/lock';
 import type {
   BookmarkMeta,
   BookmarkTree,
-  CategoryRule,
   ImportOptions,
   ImportPreview,
   LocalDB,
@@ -42,7 +41,6 @@ export interface ParsedImport {
   nodes: ImportNode[];
   /** 条目总数（书签 + 文件夹） */
   total: number;
-  rules: CategoryRule[];
   proxyBlocklist: string[];
   /** 旧 bookmarks id → 归一化 URL（JSON 才有） */
   metaByOldId: Record<string, BookmarkMeta>;
@@ -110,10 +108,9 @@ export function exportHtml(tree: BookmarkTree): string {
   return lines.join('\n');
 }
 
-/** 组装 JSON 导出的明文载荷（受管根子树 + 规则 + 代理清单 + 标签备注 + 挂起备注） */
+/** 组装 JSON 导出的明文载荷（受管根子树 + 代理清单 + 标签备注 + 挂起备注） */
 export async function buildExportPayload(): Promise<{
   bookmarks: BookmarkTree;
-  rules: CategoryRule[];
   proxyBlocklist: string[];
   bookmarkMeta: Record<string, BookmarkMeta>;
   orphanMeta: Record<string, BookmarkMeta>;
@@ -127,7 +124,6 @@ export async function buildExportPayload(): Promise<{
   );
   return {
     bookmarks,
-    rules: db.rules,
     proxyBlocklist: db.proxyBlocklist,
     bookmarkMeta: db.bookmarkMeta,
     orphanMeta: db.orphanMeta,
@@ -193,7 +189,7 @@ export function parseHtml(html: string): ParsedImport {
 
   const nodes = root.kind === 'folder' ? root.children : [];
   // HTML 不携带标签备注与挂起记录（G1）
-  return { nodes, total, rules: [], proxyBlocklist: [], metaByOldId: {}, orphanMeta: {} };
+  return { nodes, total, proxyBlocklist: [], metaByOldId: {}, orphanMeta: {} };
 }
 
 /** 把 JSON 备份的树转成 ImportNode（保留旧 id 供 meta 重绑） */
@@ -215,7 +211,6 @@ function toImportNodes(tree: BookmarkTree): ImportNode[] {
 /** 解析 JSON 备份（结构校验由 encrypt 模块负责，这里只转结构） */
 export function parseJson(file: {
   bookmarks?: BookmarkTree;
-  rules?: CategoryRule[];
   proxyBlocklist?: string[];
   bookmarkMeta?: Record<string, BookmarkMeta>;
   orphanMeta?: Record<string, BookmarkMeta>;
@@ -232,7 +227,6 @@ export function parseJson(file: {
   return {
     nodes,
     total,
-    rules: file.rules ?? [],
     proxyBlocklist: file.proxyBlocklist ?? [],
     metaByOldId: file.bookmarkMeta ?? {},
     orphanMeta: file.orphanMeta ?? {},
@@ -289,7 +283,6 @@ export async function previewImport(parsed: ParsedImport): Promise<ImportPreview
     importable,
     duplicates,
     invalid,
-    rules: parsed.rules.length,
     metaCount: Object.keys(parsed.metaByOldId).length,
     encrypted: false,
   };
@@ -298,32 +291,6 @@ export async function previewImport(parsed: ParsedImport): Promise<ImportPreview
 /* ------------------------------------------------------------------ */
 /* 写入                                                                */
 /* ------------------------------------------------------------------ */
-
-/** 规则去重键 */
-function ruleKey(rule: CategoryRule): string {
-  return `${rule.type}::${rule.pattern.trim().toLowerCase()}::${rule.category.trim()}`;
-}
-
-/** 合并规则与代理清单（G2：追加不替换） */
-function mergeRules(existing: CategoryRule[], incoming: CategoryRule[]): CategoryRule[] {
-  const result = [...existing];
-  const seen = new Set(existing.map(ruleKey));
-  for (const rule of incoming) {
-    if (!rule || typeof rule.pattern !== 'string' || !rule.pattern.trim()) continue;
-    const key = ruleKey(rule);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    result.push({
-      id: rule.id || `import-${result.length + 1}`,
-      type: rule.type,
-      pattern: rule.pattern,
-      category: rule.category || '待分类',
-      enabled: rule.enabled !== false,
-      order: typeof rule.order === 'number' ? rule.order : result.length + 1,
-    });
-  }
-  return result;
-}
 
 /**
  * 执行导入（G2）。调用前提：已生成快照并完成二次确认。
@@ -337,7 +304,6 @@ export async function importBookmarks(
   created: number;
   duplicates: number;
   invalid: number;
-  rules: number;
   boundMeta: number;
   orphanMeta: number;
 }> {
@@ -403,8 +369,7 @@ export async function importBookmarks(
     };
     await createInto(parsed.nodes, targetId);
 
-    // 规则与代理清单：追加
-    const rules = mergeRules(db.rules, parsed.rules);
+    // 代理清单：追加（分类规则已下线，JSON 里即使带 rules 也忽略）
     const proxyBlocklist = [
       ...new Set([...db.proxyBlocklist, ...parsed.proxyBlocklist.filter(isHttpUrl)]),
     ];
@@ -442,7 +407,6 @@ export async function importBookmarks(
     // 导入会新增键（也可能把某个挂起项搬进 bookmarkMeta），整段替换最直观
     await applyPatch(
       {
-        rules,
         proxyBlocklist,
         bookmarkMeta,
         orphanMeta,
@@ -455,7 +419,6 @@ export async function importBookmarks(
       created,
       duplicates,
       invalid,
-      rules: rules.length - db.rules.length,
       boundMeta,
       orphanMeta: orphanCount,
     };

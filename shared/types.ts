@@ -91,26 +91,6 @@ export interface BookmarkMeta {
 }
 
 /* ------------------------------------------------------------------ */
-/* 分类规则                                                            */
-/* ------------------------------------------------------------------ */
-
-/** 规则类型；匹配优先级按此顺序分桶：domainExact > domainContains > urlKeyword > titleKeyword */
-export type RuleType = 'domainExact' | 'domainContains' | 'urlKeyword' | 'titleKeyword';
-
-/** 分类规则；同类型内 order 升序优先，类型优先级不可被 order 跨越（决策 D-6） */
-export interface CategoryRule {
-  id: string;
-  type: RuleType;
-  /** 匹配式：域名类作用于 host（小写去 www.）；urlKeyword 作用于完整 URL；titleKeyword 作用于标题 */
-  pattern: string;
-  /** 目标一级分类名 */
-  category: string;
-  enabled: boolean;
-  /** 同类型内优先级，升序 = 优先 */
-  order: number;
-}
-
-/* ------------------------------------------------------------------ */
 /* 链接检测                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -142,6 +122,16 @@ export interface LinkStatus {
 
 /** 快照来源；`restorePre` 为恢复前自动生成，`preOperation` 为不可逆操作前生成 */
 export type SnapshotSource = 'manual' | 'preOperation' | 'autoDaily' | 'import' | 'restorePre';
+
+/** 标题回填弹窗里的一条「替换前 → 替换后」对比项（B2） */
+export interface TitleApplyItem {
+  id: string;
+  url: string;
+  /** 当前标题 */
+  before: string;
+  /** 抓取到的新标题 */
+  after: string;
+}
 
 /**
  * 快照元信息。内容不在此处，按 512KB 分片存于 `snapchunk:<id>:<n>`；
@@ -221,7 +211,6 @@ export type OpAction =
   | 'move'
   | 'delete'
   | 'rename'
-  | 'classify'
   | 'rewrite'
   | 'refreshTitle'
   | 'import'
@@ -268,7 +257,7 @@ export interface EncryptedKeyVault {
 /* ------------------------------------------------------------------ */
 
 /** 管理页一级视图（不做路由，仅切换视图） */
-export type ManagerView = 'manager' | 'stats' | 'rules' | 'tags' | 'backup' | 'settings';
+export type ManagerView = 'manager' | 'stats' | 'tags' | 'backup' | 'settings';
 
 /** 界面偏好：只影响展示，丢数据也不影响正确性 */
 export interface UiState {
@@ -329,7 +318,6 @@ export interface Flags {
 export interface LocalDB {
   schemaVersion: number;
   settings: Settings;
-  rules: CategoryRule[];
   /** 疑似需代理域名清单 */
   proxyBlocklist: string[];
   /** 检测结果，key = bookmarkId */
@@ -391,7 +379,6 @@ export interface BackupFile {
   /** Base64(AES-256-GCM 密文，含 tag) */
   payload?: string;
   bookmarks?: BookmarkTree;
-  rules?: CategoryRule[];
   proxyBlocklist?: string[];
   bookmarkMeta?: Record<string, BookmarkMeta>;
   /** 挂起的标签备注（I1 / D-5）；旧备份没有该字段时按空处理 */
@@ -401,18 +388,6 @@ export interface BackupFile {
 /* ------------------------------------------------------------------ */
 /* 视图层辅助类型                                                      */
 /* ------------------------------------------------------------------ */
-
-/** 分类预览条目：预览阶段的归属以 manual 为准，且只在当前会话有效 */
-export interface ClassificationPreviewItem {
-  bookmarkId: string;
-  title: string;
-  url: string;
-  /** 命中的规则 id；未命中为 null（归入「待分类」） */
-  ruleId: string | null;
-  category: string;
-  /** 用户手动拖拽调整过 */
-  manual: boolean;
-}
 
 /** 重复组：URL 归一化后书签数 ≥ 2 的组 */
 export interface DuplicateGroup {
@@ -436,12 +411,11 @@ export interface JobProgress {
 /* ------------------------------------------------------------------ */
 
 /**
- * 快照实际内容（D1）：受管根子树 + 规则 + 代理清单 + bookmarkMeta + orphanMeta。
+ * 快照实际内容（D1）：受管根子树 + 代理清单 + bookmarkMeta + orphanMeta。
  * 序列化后按 512KB 分片存储，`SnapshotMeta` 只描述元信息。
  */
 export interface SnapshotContent {
   bookmarks: BookmarkTree;
-  rules: CategoryRule[];
   proxyBlocklist: string[];
   bookmarkMeta: Record<string, BookmarkMeta>;
   orphanMeta: Record<string, BookmarkMeta>;
@@ -522,8 +496,6 @@ export interface ImportPreview {
   duplicates: number;
   /** 非法／无法解析被跳过的条数 */
   invalid: number;
-  /** 解析出的规则数（仅 JSON） */
-  rules: number;
   /** 解析出的标签备注条数（仅 JSON） */
   metaCount: number;
   /** 是否检测到加密（加密 JSON 需要先解密） */

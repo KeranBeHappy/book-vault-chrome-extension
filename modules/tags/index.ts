@@ -12,7 +12,7 @@ import { withWriteLock } from '@/shared/lock';
 import { encodeUtf8, sha256Hex } from '@/shared/util';
 import { applyPatch, readDb } from '@/modules/storage';
 import { normalizeUrl } from '@/modules/dedupe';
-import type { BookmarkMeta, BookmarkNode, BookmarkTree, CategoryRule } from '@/shared/types';
+import type { BookmarkMeta, BookmarkNode, BookmarkTree } from '@/shared/types';
 
 /** 统一小写比较键（去首尾空白后） */
 function keyOf(tag: string): string {
@@ -309,15 +309,3 @@ export function tagsToText(meta: BookmarkMeta | undefined): string {
   return meta?.tags.join('|') ?? '';
 }
 
-/** 分类清单去重追加（G2：JSON 中的分类名不在现有清单时自动追加） */
-export function mergeCategoryNames(rules: CategoryRule[], existing: string[]): string[] {
-  const result = [...existing];
-  const seen = new Set(existing.map((name) => name.trim()));
-  for (const rule of rules) {
-    const name = rule.category.trim();
-    if (!name || seen.has(name)) continue;
-    seen.add(name);
-    result.push(name);
-  }
-  return result;
-}

@@ -109,9 +109,6 @@
   "view_stats": {
     "message": "Stats"
   },
-  "view_rules": {
-    "message": "Rules"
-  },
   "view_tags": {
     "message": "Tags"
   },
@@ -129,9 +126,6 @@
   },
   "opAction_rename": {
     "message": "Rename"
-  },
-  "opAction_classify": {
-    "message": "Classify"
   },
   "opAction_rewrite": {
     "message": "Rewrite links"
@@ -166,9 +160,6 @@
   "actionApply": {
     "message": "Apply"
   },
-  "actionApplyClassify": {
-    "message": "Apply categories"
-  },
   "actionBackupCloud": {
     "message": "Back up to cloud"
   },
@@ -186,9 +177,6 @@
   },
   "actionCheckLinks": {
     "message": "Check dead links"
-  },
-  "actionClassify": {
-    "message": "Sort by rules"
   },
   "actionClearFilter": {
     "message": "Clear filter"
@@ -244,9 +232,6 @@
   "actionExportJson": {
     "message": "Export JSON"
   },
-  "actionExportRules": {
-    "message": "Export rules"
-  },
   "actionGeneratePreview": {
     "message": "Generate preview"
   },
@@ -262,9 +247,6 @@
   "actionImportJson": {
     "message": "Import JSON"
   },
-  "actionImportRules": {
-    "message": "Import rules"
-  },
   "actionMerge": {
     "message": "Merge"
   },
@@ -276,9 +258,6 @@
   },
   "actionNewFolder": {
     "message": "New folder"
-  },
-  "actionNewRule": {
-    "message": "New rule"
   },
   "actionOpen": {
     "message": "Open"
@@ -354,33 +333,6 @@
   },
   "bookmarkDeleted": {
     "message": "Deleted $count bookmark(s)"
-  },
-  "classifyApplyTitle": {
-    "message": "Apply classification"
-  },
-  "classifyApplyMessage": {
-    "message": "$count bookmark(s) will be moved by the rules"
-  },
-  "classifyApplied": {
-    "message": "Moved $moved, failed $invalid"
-  },
-  "classifyDiscardHint": {
-    "message": "Original folders that become empty will be deleted"
-  },
-  "classifyImpact": {
-    "message": "Preview: $total bookmark(s), $folders empty folder(s) will be removed"
-  },
-  "classifyManual": {
-    "message": "Adjust manually"
-  },
-  "classifyPreviewHint": {
-    "message": "You can adjust the preview below; changes apply to this run only"
-  },
-  "classifyPreviewTitle": {
-    "message": "Classification preview"
-  },
-  "classifyRemovedFolders": {
-    "message": "$count empty folder(s) will be removed"
   },
   "clearVaultTitle": {
     "message": "Clear local key"
@@ -736,15 +688,6 @@
   "errBackupCorrupted": {
     "message": "The backup file is corrupted and cannot be parsed"
   },
-  "errRulePatternEmpty": {
-    "message": "Pattern cannot be empty"
-  },
-  "errRuleCategoryEmpty": {
-    "message": "Category cannot be empty"
-  },
-  "errRuleImportInvalid": {
-    "message": "Invalid rules file format"
-  },
   "errNoHttpBookmarks": {
     "message": "No http(s) bookmarks to check in the current scope"
   },
@@ -820,15 +763,6 @@
   "fieldNewPassword": {
     "message": "New password"
   },
-  "fieldRuleType": {
-    "message": "Rule type"
-  },
-  "fieldRulePattern": {
-    "message": "Pattern"
-  },
-  "fieldRuleCategory": {
-    "message": "Category"
-  },
   "fieldEnabled": {
     "message": "Enable this rule"
   },
@@ -882,9 +816,6 @@
   },
   "importInvalid": {
     "message": "$count invalid entr(ies) will be skipped"
-  },
-  "importRules": {
-    "message": "$count rule(s) will be imported"
   },
   "importMeta": {
     "message": "$count tag/note record(s) will be restored"
@@ -990,9 +921,6 @@
   },
   "noFolders": {
     "message": "No folders"
-  },
-  "noRuleMatched": {
-    "message": "No rule matched"
   },
   "noSnapshots": {
     "message": "No local snapshots"
@@ -1165,41 +1093,11 @@
   "restoreFailedNoRollback": {
     "message": "Restore failed and rollback also failed; use snapshot $id to restore manually"
   },
-  "ruleCategoryPlaceholder": {
-    "message": "e.g. Dev tools"
-  },
-  "ruleImportDone": {
-    "message": "Imported $count rule(s)"
-  },
-  "rulePatternPlaceholder": {
-    "message": "e.g. github.com or tutorial"
-  },
-  "rulesTitle": {
-    "message": "Classification rules"
-  },
-  "rulesDragHint": {
-    "message": "Drag to reorder rules of the same type"
-  },
-  "rulesGroupEmpty": {
-    "message": "No rules of this type yet"
-  },
-  "rulesPriorityHint": {
-    "message": "Priority between types is fixed; dragging only reorders within a type"
-  },
-  "ruleTypeDomainExact": {
-    "message": "Exact domain"
-  },
-  "ruleTypeDomainContains": {
-    "message": "Domain contains"
-  },
-  "ruleTypeUrlKeyword": {
-    "message": "URL keyword"
-  },
-  "ruleTypeTitleKeyword": {
-    "message": "Title keyword"
-  },
   "searchPlaceholder": {
     "message": "Search titles, links, tags or notes"
+  },
+  "selectionHiddenHint": {
+    "message": "$count selected bookmark(s) are outside the current filter and will not be touched"
   },
   "selectedCount": {
     "message": "$count selected"
@@ -1230,6 +1128,30 @@
   },
   "snapshotDeleted": {
     "message": "Snapshot deleted"
+  },
+  "previewDiffTitle": {
+    "message": "Compared with current bookmarks"
+  },
+  "previewDiffHint": {
+    "message": "The snapshot is the state before that operation; the differences below also include later changes"
+  },
+  "previewDiffNoChange": {
+    "message": "No difference from current bookmarks"
+  },
+  "previewDiffTitleChanged": {
+    "message": "$count title(s) changed"
+  },
+  "previewDiffUrlChanged": {
+    "message": "$count URL(s) changed"
+  },
+  "previewDiffAdded": {
+    "message": "$count added"
+  },
+  "previewDiffRemoved": {
+    "message": "$count removed"
+  },
+  "previewDiffMore": {
+    "message": "$count more not shown"
   },
   "snapshotPreviewTitle": {
     "message": "Snapshot contents"
@@ -1336,20 +1258,47 @@
   "titleApplyTitle": {
     "message": "Apply new titles"
   },
-  "titleApplyMessage": {
-    "message": "$count bookmark title(s) will change"
+  "titleApplyPickHint": {
+    "message": "Tick the entries to replace, or replace a single one"
+  },
+  "titleApplyColBefore": {
+    "message": "Current title"
+  },
+  "titleApplyColAfter": {
+    "message": "New title"
+  },
+  "titleApplySingle": {
+    "message": "Replace"
+  },
+  "titleApplySelected": {
+    "message": "Replace $count selected"
+  },
+  "titleApplyAllItems": {
+    "message": "Replace all"
+  },
+  "titleApplyFailedHint": {
+    "message": "$count more failed to fetch and are not listed"
   },
   "titleApplyDetail": {
-    "message": "Changes are recorded in the undo log and can be undone once"
+    "message": "Changes are recorded in the undo log and can be undone step by step"
   },
   "titleApplied": {
     "message": "Updated $updated title(s), $failed failed"
   },
-  "titleRefreshNoChange": {
-    "message": "Titles are unchanged"
+  "titleRefreshDoneNoChange": {
+    "message": "Title refresh finished: no title changed"
+  },
+  "titleRefreshDoneNoChangeFailed": {
+    "message": "Title refresh finished: no title changed ($failed failed)"
+  },
+  "titleRefreshFailed": {
+    "message": "Title refresh failed for $count bookmark(s)"
   },
   "undoTitle": {
     "message": "Undo"
+  },
+  "undoUseSnapshotHint": {
+    "message": "To step back further, restore a local snapshot above (keeps $count)"
   },
   "undoMessage": {
     "message": "Undo \"$action\"?"

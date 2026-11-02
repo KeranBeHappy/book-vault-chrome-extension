@@ -37,7 +37,6 @@ import {
   restoreSnapshot,
   undoLastOp,
 } from '@/modules/backup';
-import { applyClassification } from '@/modules/classifier';
 import {
   assertBackupStructure,
   buildEncryptedBackupFile,
@@ -239,7 +238,8 @@ async function runDailyBackup(): Promise<void> {
       return;
     }
 
-    await createSnapshot('autoDaily', `auto ${today}`);
+    // note 会显示在快照列表的「来源」后面，这里只写日期避免「每日自动 · auto 2026-11-02」
+  await createSnapshot('autoDaily', today);
     await updateRuntime({ lastDailyBackupDate: today });
 
     if (!db.settings.webdav.enabled) return;
@@ -582,10 +582,13 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
     case 'title:apply': {
       const snapshotId = await requireSnapshot(req.snapshotId);
       const results = await getResults(req.jobId);
+      // 弹窗支持单条 / 勾选 / 全部替换：只在传了 ids 时收窄范围
+      const only = req.ids && req.ids.length > 0 ? new Set(req.ids) : null;
       let updated = 0;
       let failed = 0;
       const affected: string[] = [];
       for (const [id, title] of Object.entries(results)) {
+        if (only && !only.has(id)) continue;
         const node = await getNode(id);
         if (!node || node.url === undefined) {
           failed += 1;
@@ -605,13 +608,8 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
       }
       await logOp('refreshTitle', affected, snapshotId);
       await patchDb({ flags: { statsDirty: true } });
-      return { updated, failed };
-    }
-    case 'classify:apply': {
-      const snapshotId = await requireSnapshot(req.snapshotId);
-      const result = await applyClassification(req.items);
-      await logOp('classify', req.items.map((item) => item.bookmarkId), snapshotId);
-      return result;
+      // 返回实际写入成功的 id：页面据此把已替换条目从弹窗里移除
+      return { updated, failed, appliedIds: affected };
     }
 
     /* ---------------- WebDAV ---------------- */
@@ -668,7 +666,6 @@ async function handleRequest(req: BvRequest): Promise<unknown> {
       return {
         ...preview,
         kind: 'json' as const,
-        rules: parsed.rules.length,
         metaCount: Object.keys(parsed.metaByOldId).length,
         encrypted: Boolean(file.encrypted),
       };
@@ -799,7 +796,7 @@ async function bootstrap(): Promise<void> {
 
     if (await needsMigration()) {
       // 4.7：迁移前必须先生成快照并保留
-      await createSnapshot('preOperation', 'schema migration');
+      await createSnapshot('preOperation', '版本迁移');
       try {
         await runMigrations();
       } catch (err) {
